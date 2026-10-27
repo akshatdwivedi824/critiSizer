@@ -1,0 +1,1 @@
+![CI](https://github.com/akshatdwivedi824/critiSizer/actions/workflows/ci.yml/badge.svg)

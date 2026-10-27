@@ -7,9 +7,28 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: akshat
+          POSTGRES_PASSWORD: ci-password
+          POSTGRES_DB: critisizer
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U akshat -d critisizer"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 10
+    env:
+      DATABASE_URL: postgresql+psycopg://akshat:ci-password@localhost:5432/critisizer
+      REDIS_URL: redis://localhost:6379/0
     steps:
       - uses: actions/checkout@v4
       - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
       - name: Install dependencies
         run: uv sync
       - name: Lint
