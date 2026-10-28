@@ -79,12 +79,16 @@ class OverallResult:
     spike_flag: bool
 
 
-def _check_inputs(aspect_scores: Mapping[str, Decimal], rubric: Rubric) -> None:
+def _check_inputs(
+    aspect_scores: Mapping[str, Decimal | None], rubric: Rubric
+) -> None:
     if not rubric.weights:
         raise ScoringError("rubric has no aspects")
     if set(aspect_scores) != set(rubric.weights):
         raise ScoringError("aspect scores must match the rubric's aspects exactly")
     for code, score in aspect_scores.items():
+        if score is None:
+            raise ScoringError(f"aspect has no valid evidence: {code}")
         if not Decimal(0) <= score <= Decimal(100):
             raise ScoringError(f"aspect score out of range: {code}={score}")
     for code, weight in rubric.weights.items():
@@ -110,6 +114,8 @@ def people_rating(
     ratings: Sequence[RatingInput], min_ratings: int
 ) -> tuple[Decimal | None, int]:
     """Mean of accepted ratings, or None if there are fewer than min_ratings."""
+    if min_ratings < 1:
+        raise ScoringError("min_ratings must be at least 1")
     accepted = []
     for rating in ratings:
         if rating.status not in VALID_STATUSES:
