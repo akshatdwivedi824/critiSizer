@@ -5,6 +5,7 @@ from sqlalchemy import (
     CheckConstraint,
     DateTime,
     ForeignKey,
+    Index,
     Numeric,
     String,
     Text,
@@ -63,3 +64,96 @@ class RubricWeight(Base):
     )
     aspect_id: Mapped[int] = mapped_column(ForeignKey("aspects.id"))
     weight: Mapped[Decimal] = mapped_column(Numeric(6, 2))
+
+class Indicator(Base):
+    __tablename__ = "indicators"
+    __table_args__ = (
+        CheckConstraint(
+            "score >= 0 AND score <= 100", name="ck_indicators_score_range"
+        ),
+        CheckConstraint("weight > 0", name="ck_indicators_weight_positive"),
+    )
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    policy_id: Mapped[int] = mapped_column(
+        ForeignKey("policies.id", ondelete="CASCADE"), index=True
+    )
+    aspect_id: Mapped[int] = mapped_column(ForeignKey("aspects.id"), index=True)
+    name: Mapped[str] = mapped_column(String(200))
+    score: Mapped[Decimal] = mapped_column(Numeric(5, 2))
+    weight: Mapped[Decimal] = mapped_column(Numeric(6, 2), server_default="1")
+    description: Mapped[str | None] = mapped_column(Text)
+
+
+class Evidence(Base):
+    __tablename__ = "evidence"
+    __table_args__ = (
+        UniqueConstraint("indicator_id", "content_hash"),
+        CheckConstraint(
+            "source_tier >= 1 AND source_tier <= 4", name="ck_evidence_tier_range"
+        ),
+        CheckConstraint(
+            "verification_multiplier IN (1.00, 0.80, 0.50, 0.00)",
+            name="ck_evidence_multiplier_allowed",
+        ),
+    )
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    indicator_id: Mapped[int] = mapped_column(
+        ForeignKey("indicators.id", ondelete="CASCADE")
+    )
+    source_url: Mapped[str] = mapped_column(Text)
+    source_title: Mapped[str] = mapped_column(String(300))
+    source_tier: Mapped[int]
+    verification_multiplier: Mapped[Decimal] = mapped_column(Numeric(3, 2))
+    content_hash: Mapped[str] = mapped_column(String(64))
+    archived_location: Mapped[str | None] = mapped_column(Text)
+    retrieved_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now()
+    )
+
+
+class User(Base):
+    __tablename__ = "users"
+    __table_args__ = (
+        CheckConstraint(
+            "role IN ('user', 'moderator', 'admin')", name="ck_users_role_allowed"
+        ),
+    )
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    email: Mapped[str] = mapped_column(String(255), unique=True)
+    password_hash: Mapped[str] = mapped_column(String(255))
+    role: Mapped[str] = mapped_column(String(20), server_default="user")
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now()
+    )
+
+
+class Rating(Base):
+    __tablename__ = "ratings"
+    __table_args__ = (
+        UniqueConstraint("user_id", "policy_id"),
+        CheckConstraint(
+            "value >= 0 AND value <= 100", name="ck_ratings_value_range"
+        ),
+        CheckConstraint(
+            "status IN ('pending', 'accepted', 'rejected')",
+            name="ck_ratings_status_allowed",
+        ),
+        Index("ix_ratings_policy_status", "policy_id", "status"),
+    )
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    user_id: Mapped[int] = mapped_column(
+        ForeignKey("users.id", ondelete="CASCADE")
+    )
+    policy_id: Mapped[int] = mapped_column(
+        ForeignKey("policies.id", ondelete="CASCADE")
+    )
+    value: Mapped[Decimal] = mapped_column(Numeric(5, 2))
+    status: Mapped[str] = mapped_column(String(20), server_default="pending")
+    comment: Mapped[str | None] = mapped_column(Text)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now()
+    )
