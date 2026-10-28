@@ -1,5 +1,6 @@
-from datetime import datetime
+from datetime import date, datetime
 from decimal import Decimal
+from typing import Any
 
 from sqlalchemy import (
     CheckConstraint,
@@ -12,6 +13,7 @@ from sqlalchemy import (
     UniqueConstraint,
     func,
 )
+from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column
 
 from critisizer.db import Base
@@ -154,6 +156,53 @@ class Rating(Base):
     value: Mapped[Decimal] = mapped_column(Numeric(5, 2))
     status: Mapped[str] = mapped_column(String(20), server_default="pending")
     comment: Mapped[str | None] = mapped_column(Text)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now()
+    )
+class ScoreSnapshot(Base):
+    __tablename__ = "score_snapshots"
+    __table_args__ = (
+        UniqueConstraint("policy_id", "rubric_version_id", "week"),
+        CheckConstraint(
+            "expert_average >= 0 AND expert_average <= 100",
+            name="ck_snapshots_expert_range",
+        ),
+        CheckConstraint(
+            "overall_rating >= 0 AND overall_rating <= 100",
+            name="ck_snapshots_overall_range",
+        ),
+    )
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    policy_id: Mapped[int] = mapped_column(
+        ForeignKey("policies.id", ondelete="CASCADE")
+    )
+    rubric_version_id: Mapped[int] = mapped_column(
+        ForeignKey("rubric_versions.id")
+    )
+    week: Mapped[date]
+    aspect_scores: Mapped[dict[str, Any]] = mapped_column(JSONB)
+    expert_average: Mapped[Decimal] = mapped_column(Numeric(5, 2))
+    people_rating: Mapped[Decimal | None] = mapped_column(Numeric(5, 2))
+    people_rating_count: Mapped[int] = mapped_column(server_default="0")
+    overall_rating: Mapped[Decimal] = mapped_column(Numeric(5, 2))
+    spike_flag: Mapped[bool]
+    computed_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now()
+    )
+
+
+class AuditLog(Base):
+    __tablename__ = "audit_log"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    actor_user_id: Mapped[int | None] = mapped_column(
+        ForeignKey("users.id", ondelete="SET NULL"), index=True
+    )
+    action: Mapped[str] = mapped_column(String(50))
+    target_type: Mapped[str] = mapped_column(String(50))
+    target_id: Mapped[int | None]
+    details: Mapped[dict[str, Any] | None] = mapped_column(JSONB)
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now()
     )
