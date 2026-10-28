@@ -128,3 +128,20 @@ def test_results_stay_between_0_and_100_for_random_valid_input():
 def test_bad_input_raises(bad_scores, bad_ratings, rubric):
     with pytest.raises(ScoringError):
         overall_rating(bad_scores, bad_ratings, rubric)
+
+
+def test_non_positive_aspect_weight_raises():
+    rubric = Rubric(label="x", weights={**RUBRIC.weights, "a1": Decimal(0)})
+    with pytest.raises(ScoringError, match="weight must be positive"):
+        overall_rating(scores([50] * 6), [], rubric)
+
+
+def test_non_positive_people_weight_raises():
+    rubric = Rubric(label="x", weights=RUBRIC.weights, people_weight=Decimal(0))
+    with pytest.raises(ScoringError, match="people's rating weight"):
+        overall_rating(scores([50] * 6), [], rubric)
+
+
+def test_people_rating_rejects_min_ratings_below_one():
+    with pytest.raises(ScoringError, match="min_ratings"):
+        people_rating([], 0)
