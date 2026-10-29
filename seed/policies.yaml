@@ -74,6 +74,16 @@ policies:
             tier: 4
             multiplier: 0
             text: "Invented text: an unverified allegation."
+      - aspect: ground_level_harm
+        name: Documented health complaints
+        score: 35
+        description: "Invented: complaints recorded near untreated outflows."
+        evidence:
+          - url: https://example.org/health/rivers-complaints
+            title: Fictional district health record
+            tier: 2
+            multiplier: 1.0
+            text: "Invented text: 140 health complaints near outflows."
       - aspect: legal_challenges
         name: Petition admitted
         score: 50
