@@ -282,3 +282,226 @@ policies:
         description: "Invented: meals arrive less regularly in remote schools."
         evidence:
           - {url: "https://example.org/study/meals-equity", title: "Fictional children's rights study", tier: 3, multiplier: 0.5, text: "Invented text: remote schools received meals 20 percent less often."}
+  - slug: fictional-rural-electrification-mission
+    name: Fictional Rural Electrification Mission
+    year: 2018
+    summary: "An invented mission to connect remote households to the grid. Slow but steady."
+    indicators:
+      - aspect: outcome_failure
+        name: Households connected against target
+        score: 30
+        description: "Invented: 78 percent of target households connected."
+        evidence:
+          - {url: "https://example.org/audit/electric-2023", title: "Fictional power sector audit", tier: 1, multiplier: 1.0, text: "Invented text: 78 percent of target households connected."}
+      - aspect: cost_waste
+        name: Transmission losses
+        score: 35
+        description: "Invented: line losses above the planned level."
+        evidence:
+          - {url: "https://example.org/grid/electric-losses", title: "Fictional grid operator report", tier: 2, multiplier: 1.0, text: "Invented text: line losses of 19 percent against a plan of 12."}
+      - aspect: transparency_gap
+        name: Village-level connection data
+        score: 40
+        description: "Invented: only district totals are published."
+        evidence:
+          - {url: "https://example.org/portal/electric-data", title: "Fictional ministry data portal", tier: 1, multiplier: 0.8, text: "Invented text: village-level connection figures not published."}
+      - aspect: ground_level_harm
+        name: Unreliable supply
+        score: 25
+        description: "Invented: frequent evening power cuts reported."
+        evidence:
+          - {url: "https://example.org/news/electric-cuts", title: "Fictional regional newspaper", tier: 3, multiplier: 1.0, text: "Invented text: evening power cuts in newly connected villages."}
+      - aspect: legal_challenges
+        name: Land acquisition cases
+        score: 20
+        description: "Invented: a few land compensation cases pending."
+        evidence:
+          - {url: "https://example.org/court/electric-land", title: "Fictional court listing", tier: 1, multiplier: 1.0, text: "Invented text: 6 land compensation cases pending."}
+      - aspect: equity_impact
+        name: Connection speed by caste cluster
+        score: 45
+        description: "Invented: marginalised hamlets connected last."
+        evidence:
+          - {url: "https://example.org/study/electric-equity", title: "Fictional social research paper", tier: 3, multiplier: 0.5, text: "Invented text: hamlets of marginalised groups connected 14 months later."}
+
+  - slug: fictional-public-hospital-upgrade-plan
+    name: Fictional Public Hospital Upgrade Plan
+    year: 2022
+    summary: "An invented plan to upgrade district hospitals. A serious patient-safety record."
+    indicators:
+      - aspect: outcome_failure
+        name: Upgraded wards in service
+        score: 65
+        description: "Invented: only a third of upgraded wards are open."
+        evidence:
+          - {url: "https://example.org/audit/hospital-2025", title: "Fictional health audit", tier: 1, multiplier: 1.0, text: "Invented text: 34 percent of upgraded wards in service."}
+      - aspect: cost_waste
+        name: Equipment lying unused
+        score: 55
+        description: "Invented: bought equipment without trained staff."
+        evidence:
+          - {url: "https://example.org/news/hospital-equipment", title: "Fictional national newspaper", tier: 3, multiplier: 0.8, text: "Invented text: scanners unused for lack of technicians."}
+      - aspect: transparency_gap
+        name: Incident reporting
+        score: 40
+        description: "Invented: incident reports published late."
+        evidence:
+          - {url: "https://example.org/health/hospital-incidents", title: "Fictional health department notice", tier: 2, multiplier: 1.0, text: "Invented text: incident reports published after eight months."}
+      - aspect: ground_level_harm
+        name: Patient deaths linked to outages
+        score: 82
+        description: "Invented: official inquiry linked deaths to generator failure. Tests the spike flag."
+        evidence:
+          - {url: "https://example.org/inquiry/hospital-outage", title: "Fictional judicial inquiry report", tier: 1, multiplier: 1.0, text: "Invented text: inquiry linked 11 deaths to generator failure."}
+      - aspect: ground_level_harm
+        name: Alleged denial of treatment
+        score: 70
+        description: "Invented: single unverified allegation, excluded."
+        evidence:
+          - {url: "https://example.org/social/hospital-denial", title: "Fictional anonymous post", tier: 4, multiplier: 0, text: "Invented text: anonymous claim of treatment denied."}
+      - aspect: legal_challenges
+        name: Negligence suits
+        score: 30
+        description: "Invented: a small number of negligence suits."
+        evidence:
+          - {url: "https://example.org/court/hospital-suits", title: "Fictional court listing", tier: 1, multiplier: 1.0, text: "Invented text: 5 negligence suits filed."}
+      - aspect: equity_impact
+        name: Access for remote districts
+        score: 70
+        description: "Invented: remote districts wait much longer for care."
+        evidence:
+          - {url: "https://example.org/study/hospital-equity", title: "Fictional public health study", tier: 3, multiplier: 0.8, text: "Invented text: remote districts wait three times longer for surgery."}
+
+  - slug: fictional-smart-city-challenge
+    name: Fictional Smart City Challenge
+    year: 2017
+    summary: "An invented urban modernisation challenge. Large spending, weak results."
+    indicators:
+      - aspect: outcome_failure
+        name: Flagship projects completed
+        score: 75
+        weight: 2
+        description: "Invented: most flagship projects incomplete. Counts double."
+        evidence:
+          - {url: "https://example.org/audit/smartcity-2024", title: "Fictional national audit", tier: 1, multiplier: 1.0, text: "Invented text: 27 percent of flagship projects completed."}
+      - aspect: outcome_failure
+        name: Sensor network coverage
+        score: 60
+        description: "Invented: sensor coverage below the target."
+        evidence:
+          - {url: "https://example.org/city/smartcity-sensors", title: "Fictional city corporation report", tier: 2, multiplier: 1.0, text: "Invented text: sensors cover 55 percent of the planned area."}
+      - aspect: cost_waste
+        name: Cost against budget
+        score: 82
+        description: "Invented: costs far above the budget. Tests the spike flag."
+        evidence:
+          - {url: "https://example.org/finance/smartcity-cost", title: "Fictional finance committee report", tier: 1, multiplier: 1.0, text: "Invented text: spend reached 2.6 times the approved budget."}
+      - aspect: transparency_gap
+        name: Contract disclosure
+        score: 70
+        description: "Invented: contracts awarded without public tender data."
+        evidence:
+          - {url: "https://example.org/rti/smartcity-contracts", title: "Fictional information request reply", tier: 2, multiplier: 1.0, text: "Invented text: tender documents declined as commercial secrets."}
+      - aspect: ground_level_harm
+        name: Displaced street vendors
+        score: 50
+        description: "Invented: vendors moved without alternate sites."
+        evidence:
+          - {url: "https://example.org/news/smartcity-vendors", title: "Fictional city newspaper", tier: 3, multiplier: 0.8, text: "Invented text: 900 street vendors relocated without sites."}
+      - aspect: legal_challenges
+        name: Court orders
+        score: 60
+        description: "Invented: a court stayed demolition in two zones."
+        evidence:
+          - {url: "https://example.org/court/smartcity-stay", title: "Fictional high court order", tier: 1, multiplier: 1.0, text: "Invented text: demolition stayed in two zones."}
+      - aspect: equity_impact
+        name: Benefits by neighbourhood
+        score: 65
+        description: "Invented: investment concentrated in affluent areas."
+        evidence:
+          - {url: "https://example.org/study/smartcity-equity", title: "Fictional urban policy paper", tier: 3, multiplier: 0.5, text: "Invented text: 70 percent of investment in three affluent wards."}
+
+  - slug: fictional-skills-training-voucher-scheme
+    name: Fictional Skills Training Voucher Scheme
+    year: 2024
+    summary: "An invented voucher scheme for vocational training. Few documented problems."
+    indicators:
+      - aspect: outcome_failure
+        name: Trainees placed in jobs
+        score: 10
+        description: "Invented: placement rate close to the target."
+        evidence:
+          - {url: "https://example.org/audit/skills-2025", title: "Fictional labour ministry audit", tier: 1, multiplier: 1.0, text: "Invented text: 71 percent of trainees placed against a 75 percent target."}
+      - aspect: cost_waste
+        name: Voucher misuse
+        score: 12
+        description: "Invented: very small amount of misuse."
+        evidence:
+          - {url: "https://example.org/audit/skills-vouchers", title: "Fictional voucher audit", tier: 1, multiplier: 1.0, text: "Invented text: 1.5 percent of vouchers flagged as misused."}
+      - aspect: transparency_gap
+        name: Provider listings
+        score: 20
+        description: "Invented: provider outcomes listed, methods thin."
+        evidence:
+          - {url: "https://example.org/portal/skills-providers", title: "Fictional scheme portal", tier: 1, multiplier: 1.0, text: "Invented text: provider outcomes listed without methodology notes."}
+      - aspect: ground_level_harm
+        name: Complaints about training quality
+        score: 10
+        description: "Invented: a handful of complaints."
+        evidence:
+          - {url: "https://example.org/news/skills-complaints", title: "Fictional local news report", tier: 3, multiplier: 0.8, text: "Invented text: trainees at one institute complained of poor equipment."}
+      - aspect: legal_challenges
+        name: Court cases
+        score: 5
+        description: "Invented: no court case of note."
+        evidence:
+          - {url: "https://example.org/court/skills-case", title: "Fictional court listing", tier: 1, multiplier: 1.0, text: "Invented text: one consumer complaint against a provider, closed."}
+      - aspect: equity_impact
+        name: Women's participation
+        score: 15
+        description: "Invented: women are slightly under-represented."
+        evidence:
+          - {url: "https://example.org/study/skills-equity", title: "Fictional labour research note", tier: 3, multiplier: 1.0, text: "Invented text: women are 41 percent of trainees against 48 percent of the population."}
+
+  - slug: fictional-plastic-ban-order
+    name: Fictional Plastic Ban Order
+    year: 2021
+    summary: "An invented single-use plastic ban. Weak enforcement and a legal fight."
+    indicators:
+      - aspect: outcome_failure
+        name: Reduction in plastic waste
+        score: 45
+        description: "Invented: waste fell by about half the target."
+        evidence:
+          - {url: "https://example.org/audit/plastic-2024", title: "Fictional pollution board audit", tier: 1, multiplier: 1.0, text: "Invented text: plastic waste fell 18 percent against a 35 percent target."}
+      - aspect: cost_waste
+        name: Enforcement cost
+        score: 40
+        description: "Invented: inspection costs over plan."
+        evidence:
+          - {url: "https://example.org/finance/plastic-inspections", title: "Fictional municipal finance report", tier: 2, multiplier: 0.8, text: "Invented text: inspection budget exceeded by 27 percent."}
+      - aspect: transparency_gap
+        name: Enforcement data
+        score: 50
+        description: "Invented: fines issued are not published."
+        evidence:
+          - {url: "https://example.org/rti/plastic-fines", title: "Fictional information request reply", tier: 2, multiplier: 1.0, text: "Invented text: fine records declined on grounds of ongoing cases."}
+      - aspect: ground_level_harm
+        name: Small trader losses
+        score: 55
+        description: "Invented: market traders reported lost income."
+        evidence:
+          - {url: "https://example.org/survey/plastic-traders", title: "Fictional traders association survey", tier: 2, multiplier: 1.0, text: "Invented text: 62 percent of surveyed traders reported lost income."}
+          - {url: "https://example.org/social/plastic-closures", title: "Fictional social media claim", tier: 4, multiplier: 0, text: "Invented text: unverified claim of mass shop closures."}
+      - aspect: legal_challenges
+        name: Challenge to the order
+        score: 72
+        description: "Invented: the order itself was challenged and partly struck down."
+        evidence:
+          - {url: "https://example.org/court/plastic-order", title: "Fictional high court judgment", tier: 1, multiplier: 1.0, text: "Invented text: part of the order set aside as overbroad."}
+      - aspect: equity_impact
+        name: Burden on informal workers
+        score: 40
+        description: "Invented: informal recyclers lost income."
+        evidence:
+          - {url: "https://example.org/study/plastic-equity", title: "Fictional labour study", tier: 3, multiplier: 0.5, text: "Invented text: informal recyclers report 30 percent less income."}
