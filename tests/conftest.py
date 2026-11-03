@@ -1,7 +1,9 @@
 import os
 from collections.abc import Iterator
+from urllib.parse import urlparse
 
 import pytest
+import redis
 from alembic import command
 from alembic.config import Config
 from dotenv import dotenv_values
@@ -10,11 +12,18 @@ from sqlalchemy.engine import make_url
 from sqlalchemy.orm import Session
 
 TEST_DB_NAME = "critisizer_test"
+TEST_REDIS_DB = 15
 
 _dev_url = os.environ.get("DATABASE_URL") or dotenv_values(".env")["DATABASE_URL"]
 _test_url = make_url(_dev_url).set(database=TEST_DB_NAME)
 # Set before anything from critisizer is imported, so the app uses the test database.
 os.environ["DATABASE_URL"] = _test_url.render_as_string(hide_password=False)
+
+# Same idea for Redis: tests use database 15, never the dev data in database 0.
+_dev_redis = os.environ.get("REDIS_URL") or dotenv_values(".env")["REDIS_URL"]
+os.environ["REDIS_URL"] = (
+    urlparse(_dev_redis)._replace(path=f"/{TEST_REDIS_DB}").geturl()
+)
 
 
 @pytest.fixture(scope="session")
@@ -37,6 +46,23 @@ def test_engine():
     command.downgrade(config, "base")
     command.upgrade(config, "head")
     yield engine
+
+
+@pytest.fixture(autouse=True)
+def clean_redis() -> Iterator[None]:
+    """Empty the test Redis database before and after every test."""
+
+    def flush() -> None:
+        try:
+            redis.Redis.from_url(
+                os.environ["REDIS_URL"], socket_connect_timeout=1, socket_timeout=1
+            ).flushdb()
+        except redis.RedisError:
+            pass  # tests that need Redis will fail on their own
+
+    flush()
+    yield
+    flush()
 
 
 @pytest.fixture

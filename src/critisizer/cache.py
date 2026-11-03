@@ -51,3 +51,23 @@ def delete(key: str) -> None:
         get_redis().delete(key)
     except redis.RedisError:
         log.warning("cache delete failed for %s", key, exc_info=True)
+
+
+def hit_rate_limit(key: str, limit: int, window_seconds: int) -> int | None:
+    """Count one attempt in a fixed window.
+
+    Returns None if the attempt is allowed, or the number of seconds to wait
+    if the limit is exceeded. Fails open (returns None) if Redis is down.
+    """
+    try:
+        pipe = get_redis().pipeline(transaction=True)
+        pipe.incr(key)
+        pipe.expire(key, window_seconds, nx=True)  # set the TTL only on the first hit
+        pipe.ttl(key)
+        count, _, ttl = pipe.execute()
+    except redis.RedisError:
+        log.warning("rate limit check failed for %s", key, exc_info=True)
+        return None
+    if count > limit:
+        return max(int(ttl), 1)
+    return None
