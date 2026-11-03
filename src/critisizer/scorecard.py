@@ -9,6 +9,7 @@ from critisizer.models import (
     Evidence,
     Indicator,
     Policy,
+    Rating,
     RubricVersion,
     RubricWeight,
 )
@@ -22,6 +23,7 @@ from critisizer.schemas import (
 from critisizer.scoring.engine import (
     IndicatorInput,
     OverallResult,
+    RatingInput,
     Rubric,
     aspect_score,
     overall_rating,
@@ -78,8 +80,11 @@ def score_policy(session: Session, policy_id: int, rubric: Rubric) -> OverallRes
         ]
         aspect_scores[code] = aspect_score(inputs)
 
-    # No user ratings exist yet, so the people's rating is absent for now.
-    return overall_rating(aspect_scores, [], rubric)
+    rating_rows = session.execute(
+        select(Rating.value, Rating.status).where(Rating.policy_id == policy_id)
+    ).all()
+    ratings = [RatingInput(value=Decimal(str(v)), status=s) for v, s in rating_rows]
+    return overall_rating(aspect_scores, ratings, rubric)
 
 
 def _r(value: Decimal) -> float:
@@ -98,6 +103,7 @@ def _summary_fields(policy: Policy, result: OverallResult) -> dict:
             None if result.people_rating is None else _r(result.people_rating)
         ),
         "people_rating_count": result.people_rating_count,
+        "people_rating_visible": result.people_rating is not None,
     }
 
 

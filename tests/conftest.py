@@ -41,6 +41,24 @@ def test_engine():
 
 @pytest.fixture
 def session(test_engine) -> Iterator[Session]:
-    with Session(test_engine) as db_session:
+    connection = test_engine.connect()
+    outer = connection.begin()
+    db_session = Session(bind=connection, join_transaction_mode="create_savepoint")
+    try:
         yield db_session
-        db_session.rollback()
+    finally:
+        db_session.close()
+        outer.rollback()
+        connection.close()
+
+
+@pytest.fixture
+def client(session):
+    from fastapi.testclient import TestClient
+
+    from critisizer.deps import get_session
+    from critisizer.main import app
+
+    app.dependency_overrides[get_session] = lambda: session
+    yield TestClient(app)
+    app.dependency_overrides.clear()

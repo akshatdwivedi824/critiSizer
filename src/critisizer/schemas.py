@@ -33,6 +33,7 @@ class PolicySummary(BaseModel):
     spike_flag: bool
     people_rating: float | None
     people_rating_count: int
+    people_rating_visible: bool
 
 
 class PolicyDetail(PolicySummary):
