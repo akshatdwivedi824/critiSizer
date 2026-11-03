@@ -26,9 +26,7 @@ def verify_password(password: str, stored: str) -> bool:
         return False
     if scheme != "scrypt":
         return False
-    digest = hashlib.scrypt(
-        password.encode(), salt=bytes.fromhex(salt_hex), **_SCRYPT
-    )
+    digest = hashlib.scrypt(password.encode(), salt=bytes.fromhex(salt_hex), **_SCRYPT)
     return hmac.compare_digest(digest.hex(), digest_hex)
 
 

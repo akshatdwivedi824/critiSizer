@@ -120,9 +120,7 @@ def build_policy_detail(
     result = score_policy(session, policy.id, rubric)
     aspects = session.scalars(select(Aspect).order_by(Aspect.id)).all()
     indicators = session.scalars(
-        select(Indicator)
-        .where(Indicator.policy_id == policy.id)
-        .order_by(Indicator.id)
+        select(Indicator).where(Indicator.policy_id == policy.id).order_by(Indicator.id)
     ).all()
     evidence = session.scalars(
         select(Evidence)

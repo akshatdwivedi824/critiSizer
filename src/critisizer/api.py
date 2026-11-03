@@ -35,7 +35,8 @@ def get_policy(slug: str, session: SessionDep) -> PolicyDetail:
         raise HTTPException(status_code=404, detail="Policy not found")
     rubric = load_active_rubric(session)
     return build_policy_detail(session, policy, rubric)
-    
+
+
 class RatingIn(BaseModel):
     value: float = Field(ge=0, le=100)
     comment: str | None = Field(default=None, max_length=1000)

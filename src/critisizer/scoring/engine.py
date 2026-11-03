@@ -50,6 +50,7 @@ def aspect_score(indicators: Sequence[IndicatorInput]) -> Decimal | None:
     weighted = sum((i.weight * i.multiplier * i.score for i in used), Decimal(0))
     return weighted / total_weight
 
+
 VALID_STATUSES = frozenset({"pending", "accepted", "rejected"})
 
 
@@ -79,9 +80,7 @@ class OverallResult:
     spike_flag: bool
 
 
-def _check_inputs(
-    aspect_scores: Mapping[str, Decimal | None], rubric: Rubric
-) -> None:
+def _check_inputs(aspect_scores: Mapping[str, Decimal | None], rubric: Rubric) -> None:
     if not rubric.weights:
         raise ScoringError("rubric has no aspects")
     if set(aspect_scores) != set(rubric.weights):

@@ -67,6 +67,7 @@ class RubricWeight(Base):
     aspect_id: Mapped[int] = mapped_column(ForeignKey("aspects.id"))
     weight: Mapped[Decimal] = mapped_column(Numeric(6, 2))
 
+
 class Indicator(Base):
     __tablename__ = "indicators"
     __table_args__ = (
@@ -118,10 +119,10 @@ class Evidence(Base):
 class User(Base):
     __tablename__ = "users"
     __table_args__ = (
-       CheckConstraint(
-           "role IN ('user', 'moderator', 'admin')", name="ck_users_role_allowed"
-       ),
-       UniqueConstraint("token_hash", name="uq_users_token_hash"),
+        CheckConstraint(
+            "role IN ('user', 'moderator', 'admin')", name="ck_users_role_allowed"
+        ),
+        UniqueConstraint("token_hash", name="uq_users_token_hash"),
     )
 
     id: Mapped[int] = mapped_column(primary_key=True)
@@ -138,9 +139,7 @@ class Rating(Base):
     __tablename__ = "ratings"
     __table_args__ = (
         UniqueConstraint("user_id", "policy_id"),
-        CheckConstraint(
-            "value >= 0 AND value <= 100", name="ck_ratings_value_range"
-        ),
+        CheckConstraint("value >= 0 AND value <= 100", name="ck_ratings_value_range"),
         CheckConstraint(
             "status IN ('pending', 'accepted', 'rejected')",
             name="ck_ratings_status_allowed",
@@ -149,9 +148,7 @@ class Rating(Base):
     )
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    user_id: Mapped[int] = mapped_column(
-        ForeignKey("users.id", ondelete="CASCADE")
-    )
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"))
     policy_id: Mapped[int] = mapped_column(
         ForeignKey("policies.id", ondelete="CASCADE")
     )
@@ -161,6 +158,8 @@ class Rating(Base):
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now()
     )
+
+
 class ScoreSnapshot(Base):
     __tablename__ = "score_snapshots"
     __table_args__ = (
@@ -179,9 +178,7 @@ class ScoreSnapshot(Base):
     policy_id: Mapped[int] = mapped_column(
         ForeignKey("policies.id", ondelete="CASCADE")
     )
-    rubric_version_id: Mapped[int] = mapped_column(
-        ForeignKey("rubric_versions.id")
-    )
+    rubric_version_id: Mapped[int] = mapped_column(ForeignKey("rubric_versions.id"))
     week: Mapped[date]
     aspect_scores: Mapped[dict[str, Any]] = mapped_column(JSONB)
     expert_average: Mapped[Decimal] = mapped_column(Numeric(5, 2))
