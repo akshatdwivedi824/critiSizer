@@ -122,7 +122,11 @@ def test_results_stay_between_0_and_100_for_random_valid_input():
         (scores([50] * 6), ratings([101]), RUBRIC),
         (scores([50] * 6), [RatingInput(Decimal(50), "approved")], RUBRIC),
         (scores([50] * 6), [], Rubric(label="x", weights={}, min_ratings=5)),
-        (scores([50] * 6), [], Rubric(label="x", weights=RUBRIC.weights, min_ratings=0)),
+        (
+            scores([50] * 6),
+            [],
+            Rubric(label="x", weights=RUBRIC.weights, min_ratings=0),
+        ),
     ],
 )
 def test_bad_input_raises(bad_scores, bad_ratings, rubric):
