@@ -3,7 +3,22 @@ from decimal import Decimal
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from critisizer.models import Aspect, Evidence, Indicator, RubricVersion, RubricWeight
+from critisizer.formatting import round_score
+from critisizer.models import (
+    Aspect,
+    Evidence,
+    Indicator,
+    Policy,
+    RubricVersion,
+    RubricWeight,
+)
+from critisizer.schemas import (
+    AspectScoreOut,
+    EvidenceOut,
+    IndicatorOut,
+    PolicyDetail,
+    PolicySummary,
+)
 from critisizer.scoring.engine import (
     IndicatorInput,
     OverallResult,
@@ -65,3 +80,88 @@ def score_policy(session: Session, policy_id: int, rubric: Rubric) -> OverallRes
 
     # No user ratings exist yet, so the people's rating is absent for now.
     return overall_rating(aspect_scores, [], rubric)
+
+
+def _r(value: Decimal) -> float:
+    return float(round_score(value))
+
+
+def _summary_fields(policy: Policy, result: OverallResult) -> dict:
+    return {
+        "slug": policy.slug,
+        "name": policy.name,
+        "year": policy.year,
+        "summary": policy.summary,
+        "overall_rating": _r(result.overall_rating),
+        "spike_flag": result.spike_flag,
+        "people_rating": (
+            None if result.people_rating is None else _r(result.people_rating)
+        ),
+        "people_rating_count": result.people_rating_count,
+    }
+
+
+def build_policy_summary(
+    session: Session, policy: Policy, rubric: Rubric
+) -> PolicySummary:
+    result = score_policy(session, policy.id, rubric)
+    return PolicySummary(**_summary_fields(policy, result))
+
+
+def build_policy_detail(
+    session: Session, policy: Policy, rubric: Rubric
+) -> PolicyDetail:
+    result = score_policy(session, policy.id, rubric)
+    aspects = session.scalars(select(Aspect).order_by(Aspect.id)).all()
+    indicators = session.scalars(
+        select(Indicator)
+        .where(Indicator.policy_id == policy.id)
+        .order_by(Indicator.id)
+    ).all()
+    evidence = session.scalars(
+        select(Evidence)
+        .where(Evidence.indicator_id.in_([i.id for i in indicators]))
+        .order_by(Evidence.id)
+    ).all()
+
+    ev_by_ind: dict[int, list[Evidence]] = {}
+    for ev in evidence:
+        ev_by_ind.setdefault(ev.indicator_id, []).append(ev)
+
+    aspect_out = []
+    for aspect in aspects:
+        items = [
+            IndicatorOut(
+                name=ind.name,
+                description=ind.description,
+                score=float(ind.score),
+                weight=float(ind.weight),
+                evidence=[
+                    EvidenceOut(
+                        source_url=ev.source_url,
+                        source_title=ev.source_title,
+                        source_tier=ev.source_tier,
+                        multiplier=float(ev.verification_multiplier),
+                        excluded=ev.verification_multiplier == 0,
+                    )
+                    for ev in ev_by_ind.get(ind.id, [])
+                ],
+            )
+            for ind in indicators
+            if ind.aspect_id == aspect.id
+        ]
+        aspect_out.append(
+            AspectScoreOut(
+                code=aspect.code,
+                name=aspect.name,
+                score=_r(result.aspect_scores[aspect.code]),
+                indicators=items,
+            )
+        )
+
+    return PolicyDetail(
+        **_summary_fields(policy, result),
+        rubric_label=result.rubric_label,
+        expert_average=_r(result.expert_average),
+        aspects=aspect_out,
+    )

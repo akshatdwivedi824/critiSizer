@@ -4,9 +4,13 @@ from fastapi import APIRouter, HTTPException
 from fastapi.responses import HTMLResponse
 from sqlalchemy import select
 
-from critisizer.db import SessionLocal
-from critisizer.models import Aspect, Evidence, Indicator, Policy
-from critisizer.scorecard import load_active_rubric, score_policy
+from critisizer.deps import SessionDep
+from critisizer.models import Policy
+from critisizer.scorecard import (
+    build_policy_detail,
+    build_policy_summary,
+    load_active_rubric,
+)
 
 router = APIRouter()
 
@@ -43,102 +47,78 @@ def layout(title: str, body: str) -> HTMLResponse:
 
 
 @router.get("/", response_class=HTMLResponse)
-def index() -> HTMLResponse:
-    with SessionLocal() as session:
-        rows = session.execute(
-            select(
-                Policy.id, Policy.slug, Policy.name, Policy.year, Policy.summary
-            ).order_by(Policy.name)
-        ).all()
-        rubric = load_active_rubric(session) if rows else None
-        cards = []
-        for policy_id, slug, name, year, summary in rows:
-            result = score_policy(session, policy_id, rubric)
-            spike = " <span class='spike'>SPIKE</span>" if result.spike_flag else ""
+def index(session: SessionDep) -> HTMLResponse:
+    policies = session.scalars(select(Policy).order_by(Policy.name)).all()
+    cards = []
+    if policies:
+        rubric = load_active_rubric(session)
+        for policy in policies:
+            view = build_policy_summary(session, policy, rubric)
+            spike = " <span class='spike'>SPIKE</span>" if view.spike_flag else ""
             cards.append(
                 f"<div class='card'><span class='score big'>"
-                f"{result.overall_rating:.1f}</span>{spike} "
-                f"<a href='/policies/{escape(slug)}'><strong>{escape(name)}</strong>"
-                f"</a> ({year})<br><span class='note'>{escape(summary or '')}"
-                "</span></div>"
+                f"{view.overall_rating:.1f}</span>{spike} "
+                f"<a href='/policies/{escape(view.slug)}'>"
+                f"<strong>{escape(view.name)}</strong></a> ({view.year})<br>"
+                f"<span class='note'>{escape(view.summary or '')}</span></div>"
             )
-    if not cards:
+    else:
         cards = ["<p>No policies yet. Run <code>scripts/seed.py</code>.</p>"]
     return layout("critiSizer", f"<h1>critiSizer</h1>{''.join(cards)}")
 
 
 @router.get("/policies/{slug}", response_class=HTMLResponse)
-def policy_page(slug: str) -> HTMLResponse:
-    with SessionLocal() as session:
-        policy = session.scalar(select(Policy).where(Policy.slug == slug))
-        if policy is None:
-            raise HTTPException(status_code=404, detail="Policy not found")
-        rubric = load_active_rubric(session)
-        result = score_policy(session, policy.id, rubric)
-        aspects = session.scalars(select(Aspect).order_by(Aspect.id)).all()
-        indicators = session.scalars(
-            select(Indicator)
-            .where(Indicator.policy_id == policy.id)
-            .order_by(Indicator.id)
-        ).all()
-        evidence = session.scalars(
-            select(Evidence).where(Evidence.indicator_id.in_([i.id for i in indicators]))
-        ).all()
+def policy_page(slug: str, session: SessionDep) -> HTMLResponse:
+    policy = session.scalar(select(Policy).where(Policy.slug == slug))
+    if policy is None:
+        raise HTTPException(status_code=404, detail="Policy not found")
+    rubric = load_active_rubric(session)
+    view = build_policy_detail(session, policy, rubric)
 
-        ev_by_ind: dict[int, list[Evidence]] = {}
-        for ev in evidence:
-            ev_by_ind.setdefault(ev.indicator_id, []).append(ev)
-
-        sections = []
-        for aspect in aspects:
-            items = [i for i in indicators if i.aspect_id == aspect.id]
-            if not items:
-                continue
-            rows = []
-            for ind in items:
-                ev_html = ""
-                for ev in ev_by_ind.get(ind.id, []):
-                    excluded = ev.verification_multiplier == 0
-                    css = "ev excluded" if excluded else "ev"
-                    tag = " (excluded)" if excluded else ""
-                    ev_html += (
-                        f"<div class='{css}'>Tier {ev.source_tier}, "
-                        f"x{ev.verification_multiplier}: "
-                        f"<a href='{escape(ev.source_url)}'>"
-                        f"{escape(ev.source_title)}</a>{tag}</div>"
-                    )
-                rows.append(
-                    f"<div class='ind'><span class='score'>{ind.score:.0f}</span> "
-                    f"{escape(ind.name)}"
-                    f"<br><span class='note'>{escape(ind.description or '')}</span>"
-                    f"{ev_html}</div>"
+    sections = []
+    for aspect in view.aspects:
+        if not aspect.indicators:
+            continue
+        rows = []
+        for ind in aspect.indicators:
+            ev_html = ""
+            for ev in ev_html_source(ind):
+                css = "ev excluded" if ev.excluded else "ev"
+                tag = " (excluded)" if ev.excluded else ""
+                ev_html += (
+                    f"<div class='{css}'>Tier {ev.source_tier}, x{ev.multiplier}: "
+                    f"<a href='{escape(ev.source_url)}'>"
+                    f"{escape(ev.source_title)}</a>{tag}</div>"
                 )
-            aspect_value = result.aspect_scores[aspect.code]
-            sections.append(
-                f"<div class='card'><h3>{escape(aspect.name)} "
-                f"<span class='score'>{aspect_value:.1f}</span></h3>"
-                f"{''.join(rows)}</div>"
+            rows.append(
+                f"<div class='ind'><span class='score'>{ind.score:.0f}</span> "
+                f"{escape(ind.name)}"
+                f"<br><span class='note'>{escape(ind.description or '')}</span>"
+                f"{ev_html}</div>"
             )
-
-        if result.people_rating is not None:
-            people = f"{result.people_rating:.1f} ({result.people_rating_count} ratings)"
-        else:
-            people = (
-                f"not shown ({result.people_rating_count} ratings, "
-                f"needs {rubric.min_ratings})"
-            )
-        spike = " &middot; <span class='spike'>Spike flag</span>" if result.spike_flag else ""
-        summary_card = (
-            f"<div class='card'><span class='score big'>{result.overall_rating:.1f}"
-            f"</span> overall{spike}<br>Expert average {result.expert_average:.1f}"
-            f" &middot; People's rating: {people}<br>"
-            f"<span class='note'>Rubric {escape(result.rubric_label)}</span></div>"
+        sections.append(
+            f"<div class='card'><h3>{escape(aspect.name)} "
+            f"<span class='score'>{aspect.score:.1f}</span></h3>{''.join(rows)}</div>"
         )
 
-        body = (
-            "<p><a href='/'>&larr; All policies</a></p>"
-            f"<h1>{escape(policy.name)} ({policy.year})</h1>"
-            f"<p>{escape(policy.summary or '')}</p>{summary_card}{''.join(sections)}"
-        )
-        title = policy.name
-    return layout(title, body)
+    if view.people_rating is not None:
+        people = f"{view.people_rating:.1f} ({view.people_rating_count} ratings)"
+    else:
+        people = f"not shown yet ({view.people_rating_count} ratings so far)"
+    spike = " &middot; <span class='spike'>Spike flag</span>" if view.spike_flag else ""
+    summary_card = (
+        f"<div class='card'><span class='score big'>{view.overall_rating:.1f}"
+        f"</span> overall{spike}<br>Expert average {view.expert_average:.1f}"
+        f" &middot; People's rating: {people}<br>"
+        f"<span class='note'>Rubric {escape(view.rubric_label)}</span></div>"
+    )
+    body = (
+        "<p><a href='/'>&larr; All policies</a></p>"
+        f"<h1>{escape(view.name)} ({view.year})</h1>"
+        f"<p>{escape(view.summary or '')}</p>{summary_card}{''.join(sections)}"
+    )
+    return layout(view.name, body)
+
+
+def ev_html_source(indicator):
+    return indicator.evidence
