@@ -59,7 +59,7 @@ def list_policies(session: SessionDep, response: Response) -> list[PolicySummary
     rubric = load_active_rubric(session)
 
     # The rubric label is part of the key, so a new rubric never serves old scores.
-    key = f"policies:list:v1:{rubric.label}"
+    key = f"{cache.LIST_CACHE_PREFIX}{rubric.label}"
     cached = cache.get_json(key)
     if cached is not None:
         response.headers["X-Cache"] = "HIT"

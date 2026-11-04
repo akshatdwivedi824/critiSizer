@@ -17,6 +17,9 @@ log = logging.getLogger(__name__)
 # Short timeouts: a dead Redis must cost milliseconds, not hang the request.
 _TIMEOUT_SECONDS = 0.2
 
+# Every cached policy list starts with this; the rubric label follows.
+LIST_CACHE_PREFIX = "policies:list:v1:"
+
 
 @lru_cache
 def get_redis() -> redis.Redis:
@@ -54,6 +57,18 @@ def delete(key: str) -> None:
         get_redis().delete(key)
     except redis.RedisError:
         log.warning("cache delete failed for %s", key, exc_info=True)
+
+
+def delete_prefix(prefix: str) -> int:
+    """Delete every key that starts with prefix. Returns how many were deleted;
+    0 if Redis is down (logged, never raised)."""
+    try:
+        client = get_redis()
+        keys = list(client.scan_iter(match=f"{prefix}*", count=100))
+        return int(client.delete(*keys)) if keys else 0
+    except redis.RedisError:
+        log.warning("cache delete failed for prefix %s", prefix, exc_info=True)
+        return 0
 
 
 def hit_rate_limit(key: str, limit: int, window_seconds: int) -> int | None:

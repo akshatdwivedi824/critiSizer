@@ -13,6 +13,7 @@ from sqlalchemy.orm import Session
 
 TEST_DB_NAME = "critisizer_test"
 TEST_REDIS_DB = 15
+TEST_ADMIN_TOKEN = "test-admin-token-not-secret"
 
 _dev_url = os.environ.get("DATABASE_URL") or dotenv_values(".env")["DATABASE_URL"]
 _test_url = make_url(_dev_url).set(database=TEST_DB_NAME)
@@ -24,6 +25,9 @@ _dev_redis = os.environ.get("REDIS_URL") or dotenv_values(".env")["REDIS_URL"]
 os.environ["REDIS_URL"] = (
     urlparse(_dev_redis)._replace(path=f"/{TEST_REDIS_DB}").geturl()
 )
+
+# A known admin token, so tests never depend on the real one in .env.
+os.environ["ADMIN_TOKEN"] = TEST_ADMIN_TOKEN
 
 
 @pytest.fixture(scope="session")
@@ -105,3 +109,8 @@ def redis_down(monkeypatch):
     from critisizer import cache
 
     monkeypatch.setattr(cache, "get_redis", lambda: _DeadRedis())
+
+
+@pytest.fixture
+def admin_headers() -> dict[str, str]:
+    return {"Authorization": f"Bearer {TEST_ADMIN_TOKEN}"}
