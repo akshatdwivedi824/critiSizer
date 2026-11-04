@@ -7,8 +7,7 @@ from critisizer.models import Aspect, RubricVersion, RubricWeight
 
 with SessionLocal() as session:
     aspects = [
-        Aspect(code=f"a{i}", name=f"Aspect {i}", definition="test")
-        for i in range(1, 7)
+        Aspect(code=f"a{i}", name=f"Aspect {i}", definition="test") for i in range(1, 7)
     ]
     version = RubricVersion(label="test-v1")
     session.add_all([*aspects, version])

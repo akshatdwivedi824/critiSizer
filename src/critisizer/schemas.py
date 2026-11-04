@@ -1,3 +1,5 @@
+from datetime import date, datetime
+
 from pydantic import BaseModel
 
 
@@ -40,3 +42,15 @@ class PolicyDetail(PolicySummary):
     rubric_label: str
     expert_average: float
     aspects: list[AspectScoreOut]
+
+
+class SnapshotOut(BaseModel):
+    week: date
+    rubric_label: str
+    aspect_scores: dict[str, float]
+    expert_average: float
+    people_rating: float | None
+    people_rating_count: int
+    overall_rating: float
+    spike_flag: bool
+    computed_at: datetime

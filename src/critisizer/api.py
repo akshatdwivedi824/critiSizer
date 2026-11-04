@@ -9,8 +9,9 @@ from sqlalchemy.exc import IntegrityError
 from critisizer import cache
 from critisizer.auth import CurrentUser
 from critisizer.deps import SessionDep
-from critisizer.models import Policy, Rating
-from critisizer.schemas import PolicyDetail, PolicySummary
+from critisizer.formatting import round_score
+from critisizer.models import Policy, Rating, RubricVersion, ScoreSnapshot
+from critisizer.schemas import PolicyDetail, PolicySummary, SnapshotOut
 from critisizer.scorecard import (
     build_policy_detail,
     build_policy_summary,
@@ -22,6 +23,32 @@ router = APIRouter(prefix="/api", tags=["policies"])
 LIST_CACHE_TTL_SECONDS = 60
 RATING_LIMIT = 5
 RATING_WINDOW_SECONDS = 60
+
+
+def _one_decimal(value: Decimal) -> float:
+    return float(round_score(value))
+
+
+def _snapshot_out(snapshot: ScoreSnapshot, rubric_label: str) -> SnapshotOut:
+    return SnapshotOut(
+        week=snapshot.week,
+        rubric_label=rubric_label,
+        # Stored as exact strings; rounded once, here, at the output.
+        aspect_scores={
+            code: _one_decimal(Decimal(text))
+            for code, text in snapshot.aspect_scores.items()
+        },
+        expert_average=_one_decimal(snapshot.expert_average),
+        people_rating=(
+            None
+            if snapshot.people_rating is None
+            else _one_decimal(snapshot.people_rating)
+        ),
+        people_rating_count=snapshot.people_rating_count,
+        overall_rating=_one_decimal(snapshot.overall_rating),
+        spike_flag=snapshot.spike_flag,
+        computed_at=snapshot.computed_at,
+    )
 
 
 @router.get("/policies", response_model=list[PolicySummary])
@@ -55,6 +82,20 @@ def get_policy(slug: str, session: SessionDep) -> PolicyDetail:
         raise HTTPException(status_code=404, detail="Policy not found")
     rubric = load_active_rubric(session)
     return build_policy_detail(session, policy, rubric)
+
+
+@router.get("/policies/{slug}/history", response_model=list[SnapshotOut])
+def get_policy_history(slug: str, session: SessionDep) -> list[SnapshotOut]:
+    policy = session.scalar(select(Policy).where(Policy.slug == slug))
+    if policy is None:
+        raise HTTPException(status_code=404, detail="Policy not found")
+    rows = session.execute(
+        select(ScoreSnapshot, RubricVersion.label)
+        .join(RubricVersion, RubricVersion.id == ScoreSnapshot.rubric_version_id)
+        .where(ScoreSnapshot.policy_id == policy.id)
+        .order_by(ScoreSnapshot.week.desc(), ScoreSnapshot.id.desc())
+    ).all()
+    return [_snapshot_out(snapshot, label) for snapshot, label in rows]
 
 
 class RatingIn(BaseModel):

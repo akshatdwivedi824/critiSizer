@@ -54,7 +54,9 @@ def main() -> int:
         tiers = set(session.scalars(select(Evidence.source_tier).distinct()))
         check("evidence tiers 1-4 all used", tiers >= {1, 2, 3, 4}, str(sorted(tiers)))
 
-        weighted = session.scalar(select(Indicator.id).where(Indicator.weight != 1).limit(1))
+        weighted = session.scalar(
+            select(Indicator.id).where(Indicator.weight != 1).limit(1)
+        )
         check("a non-default indicator weight exists", weighted is not None)
 
     for path in [
