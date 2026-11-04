@@ -1,7 +1,3 @@
-import redis
-
-from critisizer import cache
-
 # A policy that does not exist: attempts are 404, but they still count.
 URL = "/api/policies/nope/ratings"
 BODY = {"value": 50}
@@ -36,17 +32,7 @@ def test_limit_is_per_user(client):
     assert attempt(client, b).status_code == 404
 
 
-def test_rate_limit_fails_open_when_redis_is_down(client, monkeypatch):
+def test_rate_limit_fails_open_when_redis_is_down(client, redis_down):
     headers = sign_in(client, "a@example.org")
-
-    def dead() -> redis.Redis:
-        return redis.Redis(
-            host="127.0.0.1",
-            port=1,
-            socket_connect_timeout=0.2,
-            socket_timeout=0.2,
-        )
-
-    monkeypatch.setattr(cache, "get_redis", dead)
     statuses = {attempt(client, headers).status_code for _ in range(8)}
     assert statuses == {404}

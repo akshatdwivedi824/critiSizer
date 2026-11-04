@@ -1,8 +1,5 @@
 import pytest
-import redis
 from factories import CODES, fill_policy, make_aspects
-
-from critisizer import cache
 
 LIST_URL = "/api/policies"
 
@@ -11,21 +8,6 @@ LIST_URL = "/api/policies"
 def policy(session):
     aspects = make_aspects(session)
     return fill_policy(session, aspects, "cached", {c: (40, [1.0]) for c in CODES})
-
-
-@pytest.fixture
-def redis_down(monkeypatch):
-    """Point the cache at a port nothing listens on."""
-
-    def dead() -> redis.Redis:
-        return redis.Redis(
-            host="127.0.0.1",
-            port=1,
-            socket_connect_timeout=0.2,
-            socket_timeout=0.2,
-        )
-
-    monkeypatch.setattr(cache, "get_redis", dead)
 
 
 def test_list_is_a_miss_then_a_hit(client, policy):

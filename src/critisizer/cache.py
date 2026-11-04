@@ -7,6 +7,8 @@ from functools import lru_cache
 from typing import Any
 
 import redis
+from redis.backoff import NoBackoff
+from redis.retry import Retry
 
 from critisizer.config import get_settings
 
@@ -23,6 +25,7 @@ def get_redis() -> redis.Redis:
         decode_responses=True,
         socket_connect_timeout=_TIMEOUT_SECONDS,
         socket_timeout=_TIMEOUT_SECONDS,
+        retry=Retry(NoBackoff(), 0),  # fail fast: one try, no retries
     )
 
 

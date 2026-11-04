@@ -88,3 +88,20 @@ def client(session):
     app.dependency_overrides[get_session] = lambda: session
     yield TestClient(app)
     app.dependency_overrides.clear()
+
+
+class _DeadRedis:
+    """Every call fails the way a real outage does, instantly."""
+
+    def __getattr__(self, name):
+        def fail(*args, **kwargs):
+            raise redis.ConnectionError("redis is down (test)")
+
+        return fail
+
+
+@pytest.fixture
+def redis_down(monkeypatch):
+    from critisizer import cache
+
+    monkeypatch.setattr(cache, "get_redis", lambda: _DeadRedis())
