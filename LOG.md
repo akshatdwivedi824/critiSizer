@@ -70,3 +70,45 @@ would a block do to real users?]
 - Every snapshot stores its rubric version id.
 - A policy that fails scoring is logged and skipped. One bad policy does not
   stop the others.
+
+## Day 13 - Fri 6 Nov - Load test
+
+Built: loadtest/locustfile.py (80% list, 20% detail), docs/load-test.md,
+"Measured" section in docs/capacity.md, scripts/count_queries.py.
+
+Results (4 workers, 10 policies, one machine):
+- Cache on, 50 users: 328 req/s, p95 45 ms, 0 failures (limited by the test users).
+- Redis stopped, 50 users: 87 req/s, p95 580 ms.
+- Redis stopped, 200 users: 93 req/s, p95 3.2 s, saturated, 0 failures.
+- One uncached list = 43 queries (3 + 4 per policy), 41 ms. At 2,000 policies:
+  about 8,003 queries, about 8.3 s.
+
+Findings:
+- A Redis outage turns a 13 ms list into a 500 ms list (two 0.2 s timeouts).
+  Fix to build later: a circuit breaker.
+- Every TTL expiry can cause a stampede once scoring is slow.
+- The estimate (4 req/s) is met 80x over with the cache and 20x over without
+  it at 10 policies, but not at 2,000 policies without the cache.
+
+Review answer: which part of the system limits throughput first, and what is
+the fix? [Your answer, in your own words: the per-request scoring of every
+policy (queries grow with policies). Fixes: the cache now, reading the latest
+snapshot later.]
+
+   ## Day 14 - Week 2 wrap-up
+
+   Built: README with screenshot, architecture diagram, run steps and endpoint
+   table; scripts/gate2.py (19 checks, all PASS); ADR-2 (caching and failure
+   behaviour); cache helper tests. Coverage 92% before, about 94% after.
+   Tests: 98 passing. Tagged v0.2.0.
+
+   Decisions: Gate 2 reads routes from the OpenAPI schema, because this FastAPI
+   version nests included routers and app.routes does not list them.
+
+   Week 3 bullets:
+   - The load test says: scoring every policy per request is the limit; serve
+     the list from the latest snapshot, add a circuit breaker for Redis outages,
+     and protect against a stampede when the TTL expires.
+   - A stranger would not understand from the README: [your answer, for example
+     what "verification multiplier" means, or how the people's rating is gated].
+   - I want to learn next: [your answer].
