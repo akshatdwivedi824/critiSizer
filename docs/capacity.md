@@ -43,3 +43,49 @@ Total: roughly 0.3 GB in year 1. This fits on one small Postgres instance.
 
 One Postgres instance, one API process (several workers), Redis for caching
 and rate limits. Scale out only when measured numbers say so.
+
+## Measured (4 Nov 2026)
+
+Method and full tables: docs/load-test.md. 10 policies, 4 workers, one
+development machine.
+
+| | Estimate | Measured |
+|---|---|---|
+| Peak load | about 4 req/s | n/a |
+| Cache on, 50 users | | 328 req/s, p95 45 ms (a lower bound: the test users, not the server, were the limit) |
+| Cache off, 50 users | | 87 req/s, p95 580 ms (includes the cost of Redis being down) |
+| Cache off, 200 users | | 93 req/s, saturated, p95 3.2 s, no failures |
+
+Result: with the cache on, the system handles at least 80 times the estimated
+peak; with the cache off, about 20 times. At 10 policies the estimate is
+comfortably met either way.
+
+### Cost of the list endpoint
+
+One uncached list request runs 43 SQL queries for 10 policies (3 fixed plus
+4 per policy) and takes 41 ms warm, 4.1 ms per policy
+(scripts/count_queries.py). It scores every policy on every request, so the
+cost grows in direct proportion to the number of policies:
+
+| Policies | Queries per uncached list | Time per uncached list |
+|---|---|---|
+| 10 | 43 | 41 ms |
+| 100 | about 403 | about 0.4 s |
+| 2,000 | about 8,003 | about 8.3 s |
+
+At 2,000 policies, 4 workers can finish only about 0.5 uncached lists per
+second (4 / 8.3 s), which is about 8 times below the 4 req/s estimate. The
+cache hides this while it is warm, but each time the 60 s TTL expires, every
+request that arrives at that moment misses and each runs the full 8 s of
+scoring (a stampede).
+
+Caveats: single-threaded timing on a local database; the projection assumes
+cost stays linear, and a database across a network would make each query
+slower.
+
+### Conclusion
+
+The part that limits throughput first is the per-request scoring of every
+policy. Fixes, in order: the 60 s cache (done); then serve the list from the
+latest stored snapshot (one query for all policies, written by the weekly
+job) and keep live scoring for the detail page only.
