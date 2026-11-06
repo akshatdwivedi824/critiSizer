@@ -48,6 +48,18 @@ def load_active_rubric(session: Session) -> Rubric:
     )
 
 
+def scored_policy_ids(session: Session) -> set[int]:
+    """Policies with at least one indicator. The rest are 'not yet scored'."""
+    return set(session.scalars(select(Indicator.policy_id).distinct()))
+
+
+def _is_scored(session: Session, policy_id: int) -> bool:
+    found = session.scalar(
+        select(Indicator.id).where(Indicator.policy_id == policy_id).limit(1)
+    )
+    return found is not None
+
+
 def indicator_multiplier(evidence: list[Evidence]) -> Decimal:
     """An indicator stands on its best-verified evidence; no evidence means 0."""
     values = [Decimal(str(e.verification_multiplier)) for e in evidence]
@@ -97,6 +109,7 @@ def _summary_fields(policy: Policy, result: OverallResult) -> dict:
         "name": policy.name,
         "year": policy.year,
         "summary": policy.summary,
+        "scored": True,
         "overall_rating": _r(result.overall_rating),
         "spike_flag": result.spike_flag,
         "people_rating": (
@@ -107,9 +120,26 @@ def _summary_fields(policy: Policy, result: OverallResult) -> dict:
     }
 
 
+def _unscored_fields(policy: Policy) -> dict:
+    return {
+        "slug": policy.slug,
+        "name": policy.name,
+        "year": policy.year,
+        "summary": policy.summary,
+        "scored": False,
+        "overall_rating": None,
+        "spike_flag": False,
+        "people_rating": None,
+        "people_rating_count": 0,
+        "people_rating_visible": False,
+    }
+
+
 def build_policy_summary(
     session: Session, policy: Policy, rubric: Rubric
 ) -> PolicySummary:
+    if not _is_scored(session, policy.id):
+        return PolicySummary(**_unscored_fields(policy))
     result = score_policy(session, policy.id, rubric)
     return PolicySummary(**_summary_fields(policy, result))
 
@@ -117,6 +147,13 @@ def build_policy_summary(
 def build_policy_detail(
     session: Session, policy: Policy, rubric: Rubric
 ) -> PolicyDetail:
+    if not _is_scored(session, policy.id):
+        return PolicyDetail(
+            **_unscored_fields(policy),
+            rubric_label=rubric.label,
+            expert_average=None,
+            aspects=[],
+        )
     result = score_policy(session, policy.id, rubric)
     aspects = session.scalars(select(Aspect).order_by(Aspect.id)).all()
     indicators = session.scalars(

@@ -1,6 +1,6 @@
 import pytest
 from factories import CODES, fill_policy, make_aspects
-from sqlalchemy import select
+from sqlalchemy import select, text
 
 from critisizer.models import Rating
 
@@ -92,3 +92,27 @@ def test_people_rating_appears_after_five_accepted_ratings(client, session, poli
     assert body["people_rating"] == 100.0
     # (6 aspects x 40 + people 100) / 7 = 48.57
     assert body["overall_rating"] == 48.6
+
+def test_ratings_must_be_whole_numbers(client, policy):
+    headers = sign_in(client)
+    for bad in (55.5, 55.0, "55", True, None):
+        response = client.post(URL, json={"value": bad}, headers=headers)
+        assert response.status_code == 422, bad
+
+
+@pytest.mark.parametrize("value", [0, 1, 100])
+def test_edge_whole_numbers_are_accepted(client, policy, value):
+    headers = sign_in(client, f"edge{value}@example.org")
+    response = client.post(URL, json={"value": value}, headers=headers)
+    assert response.status_code == 201
+    assert response.json()["value"] == value
+
+
+def test_the_database_stores_ratings_as_integers(session):
+    kind = session.execute(
+        text(
+            "select data_type from information_schema.columns "
+            "where table_name = 'ratings' and column_name = 'value'"
+        )
+    ).scalar()
+    assert kind == "smallint"

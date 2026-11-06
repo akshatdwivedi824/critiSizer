@@ -8,6 +8,7 @@ from sqlalchemy import (
     ForeignKey,
     Index,
     Numeric,
+    SmallInteger,
     String,
     Text,
     UniqueConstraint,
@@ -36,6 +37,31 @@ class Policy(Base):
     name: Mapped[str] = mapped_column(String(200))
     year: Mapped[int]
     summary: Mapped[str] = mapped_column(Text)
+    summary_source_url: Mapped[str | None] = mapped_column(Text)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now()
+    )
+
+
+class PolicyAim(Base):
+    """What the government says the policy is for. Shown, never scored."""
+
+    __tablename__ = "policy_aims"
+    __table_args__ = (
+        CheckConstraint(
+            "status IN ('ai_draft', 'approved', 'rejected')",
+            name="ck_policy_aims_status_allowed",
+        ),
+    )
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    policy_id: Mapped[int] = mapped_column(
+        ForeignKey("policies.id", ondelete="CASCADE"), index=True
+    )
+    text: Mapped[str] = mapped_column(Text)
+    source_url: Mapped[str] = mapped_column(Text)
+    position: Mapped[int] = mapped_column(server_default="0")
+    status: Mapped[str] = mapped_column(String(20), server_default="ai_draft")
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now()
     )
@@ -75,6 +101,10 @@ class Indicator(Base):
             "score >= 0 AND score <= 100", name="ck_indicators_score_range"
         ),
         CheckConstraint("weight > 0", name="ck_indicators_weight_positive"),
+        CheckConstraint(
+            "status IN ('ai_draft', 'approved', 'rejected')",
+            name="ck_indicators_status_allowed",
+        ),
     )
 
     id: Mapped[int] = mapped_column(primary_key=True)
@@ -86,6 +116,9 @@ class Indicator(Base):
     score: Mapped[Decimal] = mapped_column(Numeric(5, 2))
     weight: Mapped[Decimal] = mapped_column(Numeric(6, 2), server_default="1")
     description: Mapped[str | None] = mapped_column(Text)
+    status: Mapped[str] = mapped_column(String(20), server_default="approved")
+    model: Mapped[str | None] = mapped_column(String(100))
+    prompt_version: Mapped[str | None] = mapped_column(String(50))
 
 
 class Evidence(Base):
@@ -111,6 +144,52 @@ class Evidence(Base):
     verification_multiplier: Mapped[Decimal] = mapped_column(Numeric(3, 2))
     content_hash: Mapped[str] = mapped_column(String(64))
     archived_location: Mapped[str | None] = mapped_column(Text)
+    quote: Mapped[str | None] = mapped_column(Text)
+    source_item_id: Mapped[int | None] = mapped_column(
+        ForeignKey("source_items.id", ondelete="SET NULL")
+    )
+    retrieved_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now()
+    )
+
+
+class EvidenceRun(Base):
+    """One fetch of source material for a policy, with the raw response kept."""
+
+    __tablename__ = "evidence_runs"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    policy_id: Mapped[int] = mapped_column(
+        ForeignKey("policies.id", ondelete="CASCADE"), index=True
+    )
+    query_version: Mapped[str] = mapped_column(String(20))
+    query_text: Mapped[str] = mapped_column(Text)
+    source_api: Mapped[str] = mapped_column(String(50))
+    fetched_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now()
+    )
+    result_count: Mapped[int] = mapped_column(server_default="0")
+    raw: Mapped[Any | None] = mapped_column(JSONB)
+
+
+class SourceItem(Base):
+    """A collected article or document excerpt, stored once per policy."""
+
+    __tablename__ = "source_items"
+    __table_args__ = (UniqueConstraint("policy_id", "content_hash"),)
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    run_id: Mapped[int] = mapped_column(
+        ForeignKey("evidence_runs.id", ondelete="CASCADE"), index=True
+    )
+    policy_id: Mapped[int] = mapped_column(
+        ForeignKey("policies.id", ondelete="CASCADE"), index=True
+    )
+    url: Mapped[str] = mapped_column(Text)
+    outlet: Mapped[str] = mapped_column(String(200))
+    published_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    excerpt: Mapped[str] = mapped_column(Text)
+    content_hash: Mapped[str] = mapped_column(String(64))
     retrieved_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now()
     )
@@ -152,7 +231,7 @@ class Rating(Base):
     policy_id: Mapped[int] = mapped_column(
         ForeignKey("policies.id", ondelete="CASCADE")
     )
-    value: Mapped[Decimal] = mapped_column(Numeric(5, 2))
+    value: Mapped[int] = mapped_column(SmallInteger)
     status: Mapped[str] = mapped_column(String(20), server_default="pending")
     comment: Mapped[str | None] = mapped_column(Text)
     created_at: Mapped[datetime] = mapped_column(

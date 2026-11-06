@@ -31,7 +31,8 @@ class PolicySummary(BaseModel):
     name: str
     year: int
     summary: str | None
-    overall_rating: float
+    scored: bool = True
+    overall_rating: float | None
     spike_flag: bool
     people_rating: float | None
     people_rating_count: int
@@ -40,7 +41,7 @@ class PolicySummary(BaseModel):
 
 class PolicyDetail(PolicySummary):
     rubric_label: str
-    expert_average: float
+    expert_average: float | None
     aspects: list[AspectScoreOut]
 
 

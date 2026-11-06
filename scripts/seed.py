@@ -80,7 +80,7 @@ def load_policies(session, policies, by_code):
         )
         session.add(policy)
         session.flush()
-        for ind in item["indicators"]:
+        for ind in item.get("indicators", []):
             indicator = Indicator(
                 policy_id=policy.id,
                 aspect_id=by_code[ind["aspect"]].id,

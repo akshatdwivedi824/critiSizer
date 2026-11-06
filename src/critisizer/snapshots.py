@@ -9,7 +9,7 @@ from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.orm import Session
 
 from critisizer.models import Policy, RubricVersion, ScoreSnapshot
-from critisizer.scorecard import load_active_rubric, score_policy
+from critisizer.scorecard import load_active_rubric, score_policy, scored_policy_ids
 from critisizer.scoring.engine import OverallResult, ScoringError
 
 log = logging.getLogger(__name__)
@@ -28,6 +28,7 @@ class SnapshotReport:
     replaced: int = 0
     skipped: int = 0
     failed: int = 0
+    unscored: int = 0
 
 
 def _values(policy_id: int, version_id: int, week: date, result: OverallResult) -> dict:
@@ -50,11 +51,12 @@ def _values(policy_id: int, version_id: int, week: date, result: OverallResult) 
 def take_snapshots(
     session: Session, week: date, replace: bool = False
 ) -> SnapshotReport:
-    """Store each policy's current scores for `week`. The caller commits.
+    """Store each scored policy's current scores for `week`. The caller commits.
 
-    An existing snapshot for the same (policy, rubric version, week) is left
-    alone unless replace=True. A policy that fails scoring is logged and
-    skipped; it never stops the others.
+    A policy with no indicators is not yet scored and gets no snapshot, so the
+    history never holds a made-up zero. An existing snapshot for the same
+    (policy, rubric version, week) is left alone unless replace=True. A policy
+    that fails scoring is logged and skipped; it never stops the others.
     """
     if week != week_start(week):
         raise ValueError(f"week must be a Monday, got {week} ({week:%A})")
@@ -65,8 +67,12 @@ def take_snapshots(
     ).one()
 
     report = SnapshotReport()
+    scored_ids = scored_policy_ids(session)
     policies = session.scalars(select(Policy).order_by(Policy.id)).all()
     for policy in policies:
+        if policy.id not in scored_ids:
+            report.unscored += 1
+            continue
         try:
             result = score_policy(session, policy.id, rubric)
         except ScoringError:

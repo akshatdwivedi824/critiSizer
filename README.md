@@ -11,7 +11,7 @@ tied to a versioned rubric.
 > **Negatives only, by design.** critiSizer shows how much criticism a policy
 > has attracted and how well that criticism is evidenced. It does not score
 > benefits and is not a verdict on whether a policy is good overall.
-> **Every policy in the seed data is fictional.**
+> **Scores are editorial and record negatives only.** The policies are real; a policy shows "Not yet scored" until documented evidence has been collected and reviewed.
 
 ![Scorecard](docs/img/scorecard.png)
 

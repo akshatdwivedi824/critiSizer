@@ -10,6 +10,7 @@ from critisizer.scorecard import (
     build_policy_detail,
     build_policy_summary,
     load_active_rubric,
+    scored_policy_ids,
 )
 
 router = APIRouter()
@@ -31,8 +32,12 @@ a { color: inherit; }
 """
 
 DISCLAIMER = (
-    "Fictional test data. This scorecard records negatives only "
-    "and is not a full evaluation of any policy. Higher means more documented problems."
+    "Scores are editorial and record negatives only; this is not a full "
+    "evaluation of any policy. Higher means more documented problems."
+)
+
+NOT_SCORED = (
+    "Scores appear here once documented evidence has been collected and reviewed."
 )
 
 
@@ -51,15 +56,25 @@ def index(session: SessionDep) -> HTMLResponse:
     policies = session.scalars(select(Policy).order_by(Policy.name)).all()
     cards = []
     if policies:
-        rubric = load_active_rubric(session)
+        scored_ids = scored_policy_ids(session)
+        rubric = load_active_rubric(session) if scored_ids else None
         for policy in policies:
+            link = (
+                f"<a href='/policies/{escape(policy.slug)}'>"
+                f"<strong>{escape(policy.name)}</strong></a> ({policy.year})"
+            )
+            if policy.id not in scored_ids:
+                cards.append(
+                    f"<div class='card'><span class='score'>Not yet scored</span> "
+                    f"{link}<br>"
+                    f"<span class='note'>{escape(policy.summary or '')}</span></div>"
+                )
+                continue
             view = build_policy_summary(session, policy, rubric)
             spike = " <span class='spike'>SPIKE</span>" if view.spike_flag else ""
             cards.append(
                 f"<div class='card'><span class='score big'>"
-                f"{view.overall_rating:.1f}</span>{spike} "
-                f"<a href='/policies/{escape(view.slug)}'>"
-                f"<strong>{escape(view.name)}</strong></a> ({view.year})<br>"
+                f"{view.overall_rating:.1f}</span>{spike} {link}<br>"
                 f"<span class='note'>{escape(view.summary or '')}</span></div>"
             )
     else:
@@ -72,6 +87,17 @@ def policy_page(slug: str, session: SessionDep) -> HTMLResponse:
     policy = session.scalar(select(Policy).where(Policy.slug == slug))
     if policy is None:
         raise HTTPException(status_code=404, detail="Policy not found")
+
+    if policy.id not in scored_policy_ids(session):
+        body = (
+            "<p><a href='/'>&larr; All policies</a></p>"
+            f"<h1>{escape(policy.name)} ({policy.year})</h1>"
+            f"<p>{escape(policy.summary or '')}</p>"
+            "<div class='card'><span class='score'>Not yet scored</span><br>"
+            f"<span class='note'>{NOT_SCORED}</span></div>"
+        )
+        return layout(policy.name, body)
+
     rubric = load_active_rubric(session)
     view = build_policy_detail(session, policy, rubric)
 

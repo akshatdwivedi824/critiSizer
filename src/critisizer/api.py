@@ -99,14 +99,14 @@ def get_policy_history(slug: str, session: SessionDep) -> list[SnapshotOut]:
 
 
 class RatingIn(BaseModel):
-    value: float = Field(ge=0, le=100)
+    value: int = Field(strict=True, ge=0, le=100)
     comment: str | None = Field(default=None, max_length=1000)
 
 
 class RatingOut(BaseModel):
     id: int
     policy_slug: str
-    value: float
+    value: int
     status: str
 
 
@@ -129,7 +129,7 @@ def rate_policy(
     rating = Rating(
         user_id=user.id,
         policy_id=policy.id,
-        value=Decimal(str(body.value)).quantize(Decimal("0.01")),
+        value=body.value,
         comment=body.comment,
     )
     try:
@@ -143,6 +143,6 @@ def rate_policy(
     return RatingOut(
         id=rating.id,
         policy_slug=policy.slug,
-        value=float(rating.value),
+        value=rating.value,
         status=rating.status,
     )
