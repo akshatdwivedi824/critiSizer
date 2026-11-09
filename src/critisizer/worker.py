@@ -6,7 +6,7 @@ import argparse
 import logging
 import time
 from collections.abc import Callable
-from datetime import datetime, timedelta
+from datetime import UTC, datetime, timedelta
 
 from sqlalchemy import select
 from sqlalchemy.orm import Session
@@ -15,7 +15,14 @@ from critisizer.db import SessionLocal
 from critisizer.evidence.collect import collect_for_policy
 from critisizer.evidence.gdelt import CollectError, GdeltClient
 from critisizer.evidence.text import fetch_article_text
-from critisizer.jobs import claim_next, enqueue, fail, finish, recover_stuck
+from critisizer.jobs import (
+    claim_next,
+    defer_kind,
+    enqueue,
+    fail,
+    finish,
+    recover_stuck,
+)
 from critisizer.models import Job, Policy
 
 logger = logging.getLogger("critisizer.worker")
@@ -25,6 +32,10 @@ RETRY_DEFAULT = timedelta(minutes=1)
 RETRY_RATE_LIMITED = timedelta(minutes=15)
 
 Handler = Callable[[Session, Job], None]
+
+
+def _moment(now: datetime | None) -> datetime:
+    return now or datetime.now(UTC)
 
 
 def handle_collect(
@@ -56,6 +67,8 @@ def run_once(
             handler(session, job)
     except CollectError as exc:
         fail(job, f"CollectError: {exc}", RETRY_RATE_LIMITED, now)
+        # Throttled: stop all collection for a while, not just this job.
+        defer_kind(session, job.kind, _moment(now) + RETRY_RATE_LIMITED)
     except Exception as exc:  # noqa: BLE001 - any failure is recorded on the job
         fail(job, f"{type(exc).__name__}: {exc}", RETRY_DEFAULT, now)
     else:

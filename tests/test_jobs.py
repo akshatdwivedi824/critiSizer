@@ -142,3 +142,19 @@ def test_collect_handler_needs_a_policy(session):
     session.flush()
     with pytest.raises(LookupError):
         handle_collect(session, job, _EmptyClient())
+
+
+def test_a_rate_limit_pauses_every_queued_collection(session, policy):
+    other = Policy(slug="job-test-2", name="Other", year=2020, summary="x")
+    session.add(other)
+    session.flush()
+    first = enqueue(session, "collect", policy.id, NOW)
+    second = enqueue(session, "collect", other.id, NOW)
+
+    def throttled(s, j):
+        raise CollectError("gave_up")
+
+    run_once(session, {"collect": throttled}, NOW)
+    assert first.run_after == NOW + timedelta(minutes=15)
+    assert second.run_after == NOW + timedelta(minutes=15)
+    assert run_once(session, {"collect": throttled}, NOW) is False

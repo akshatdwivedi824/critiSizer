@@ -98,3 +98,16 @@ def recover_stuck(session: Session, now: datetime | None = None) -> int:
         job.run_after = moment
     session.flush()
     return len(stuck)
+
+
+def defer_kind(
+    session: Session, kind: str, until: datetime
+) -> int:
+    """Push every queued job of this kind back, e.g. after a rate limit."""
+    jobs = session.scalars(
+        select(Job).where(Job.kind == kind, Job.status == "queued")
+    ).all()
+    for job in jobs:
+        job.run_after = max(job.run_after, until)
+    session.flush()
+    return len(jobs)
