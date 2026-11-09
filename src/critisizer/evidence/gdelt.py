@@ -15,7 +15,7 @@ from critisizer.evidence.query import MAX_RECORDS, TIMESPAN
 
 GDELT_URL = "https://api.gdeltproject.org/api/v2/doc/doc"
 MIN_GAP_SECONDS = 6.0
-RETRY_DELAYS = (0.0, 15.0, 30.0)  # seconds to wait before attempts 1, 2, 3
+RETRY_DELAYS = (0.0, 60.0, 180.0)  # seconds to wait before attempts 1, 2, 3
 
 
 class CollectError(Exception):

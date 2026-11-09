@@ -207,7 +207,7 @@ def test_client_retries_after_a_rate_limit_notice():
     _, articles = client.search("q")
     assert http.calls == 2
     assert len(articles) == 4
-    assert sleeps == [15.0, 6.0]
+    assert sleeps == [60.0, 6.0]
 
 
 def test_client_retries_after_http_429():
