@@ -18,13 +18,21 @@ TOI = "https://timesofindia.indiatimes.com/city/b/articleshow/2.cms"
 HINDU = "https://www.thehindu.com/news/c.ece"
 MIRROR = "https://mumbaimirror.indiatimes.com/mumbai/d/articleshow/4.html"
 
+
+def _row(url, title, seen, domain):
+    return {"url": url, "title": title, "seendate": seen, "domain": domain}
+
+
 GDELT_BODY = json.dumps(
     {
         "articles": [
-            {"url": HT, "title": "  Waiver for  ex-Agniveers", "seendate": "20260908T064500Z", "domain": "hindustantimes.com"},
-            {"url": TOI, "title": "20 % posts reserved", "seendate": "20260823T204500Z", "domain": "timesofindia.indiatimes.com"},
-            {"url": HINDU, "title": "Paywalled piece", "seendate": "20260820T103000Z", "domain": "thehindu.com"},
-            {"url": MIRROR, "title": "Oppn calls out govt", "seendate": "20260821T024500Z", "domain": "mumbaimirror.indiatimes.com"},
+            _row(HT, "  Waiver for  ex-Agniveers", "20260908T064500Z",
+                 "hindustantimes.com"),
+            _row(TOI, "20 % posts reserved", "20260823T204500Z",
+                 "timesofindia.indiatimes.com"),
+            _row(HINDU, "Paywalled piece", "20260820T103000Z", "thehindu.com"),
+            _row(MIRROR, "Oppn calls out govt", "20260821T024500Z",
+                 "mumbaimirror.indiatimes.com"),
         ]
     }
 )
@@ -72,6 +80,14 @@ def test_search_phrase_drops_only_trailing_generic_words():
     assert search_phrase("Agnipath Scheme") == "Agnipath"
     assert search_phrase("Electoral Bonds Scheme") == "Electoral Bonds"
     assert search_phrase("Farm Laws") == "Farm Laws"
+
+
+def test_known_policies_use_their_fixed_phrase():
+    assert search_phrase("Farm laws (repealed)", "farm-laws-2020") == "farm laws"
+    assert search_phrase("Telecommunications Act", "telecommunications-act-2023") == (
+        "Telecommunications Act"
+    )
+    assert search_phrase("Some New Policy", "new-1") == "Some New"
 
 
 def test_parse_articles_reads_fields_and_dates():
@@ -133,8 +149,12 @@ def test_enough_to_score_needs_three_items_from_two_outlets(session, policy):
     assert enough_to_score(session, policy.id) is False  # only 2 items
     session.add(
         SourceItem(
-            run_id=report.run_id, policy_id=policy.id, url="https://x/3",
-            outlet="The Hindu", excerpt="Agnipath third", content_hash="h3",
+            run_id=report.run_id,
+            policy_id=policy.id,
+            url="https://x/3",
+            outlet="The Hindu",
+            excerpt="Agnipath third",
+            content_hash="h3",
         )
     )
     session.flush()
@@ -146,8 +166,12 @@ def test_three_items_from_one_outlet_is_not_enough(session, policy):
     for n in range(3):
         session.add(
             SourceItem(
-                run_id=report.run_id, policy_id=policy.id, url=f"https://x/{n}",
-                outlet="Mint", excerpt=f"Agnipath {n}", content_hash=f"h{n}",
+                run_id=report.run_id,
+                policy_id=policy.id,
+                url=f"https://x/{n}",
+                outlet="Mint",
+                excerpt=f"Agnipath {n}",
+                content_hash=f"h{n}",
             )
         )
     session.flush()
@@ -155,8 +179,9 @@ def test_three_items_from_one_outlet_is_not_enough(session, policy):
 
 
 class _Resp:
-    def __init__(self, text):
+    def __init__(self, text, status_code=200):
         self.text = text
+        self.status_code = status_code
 
     def raise_for_status(self):
         return None
@@ -169,21 +194,32 @@ class _Http:
 
     def get(self, url, params=None):
         self.calls += 1
-        return _Resp(self.bodies.pop(0))
+        item = self.bodies.pop(0)
+        if item == 429:
+            return _Resp("", 429)
+        return _Resp(item)
 
 
-def test_client_waits_between_calls_and_retries_once():
+def test_client_retries_after_a_rate_limit_notice():
     sleeps = []
     http = _Http(["Please limit requests to one every 5 seconds", GDELT_BODY])
     client = GdeltClient(http=http, sleep=sleeps.append, clock=lambda: 100.0)
     _, articles = client.search("q")
     assert http.calls == 2
     assert len(articles) == 4
-    assert sleeps == [6.0]
+    assert sleeps == [15.0, 6.0]
 
-def test_known_policies_use_their_fixed_phrase():
-    assert search_phrase("Farm laws (repealed)", "farm-laws-2020") == "farm laws"
-    assert search_phrase("Telecommunications Act", "telecommunications-act-2023") == (
-        "Telecommunications Act"
-    )
-    assert search_phrase("Some New Policy", "new-1") == "Some New"
+
+def test_client_retries_after_http_429():
+    http = _Http([429, 429, GDELT_BODY])
+    client = GdeltClient(http=http, sleep=lambda s: None, clock=lambda: 100.0)
+    _, articles = client.search("q")
+    assert http.calls == 3
+    assert len(articles) == 4
+
+
+def test_client_gives_up_after_three_attempts():
+    http = _Http([429, 429, 429])
+    client = GdeltClient(http=http, sleep=lambda s: None, clock=lambda: 100.0)
+    with pytest.raises(CollectError):
+        client.search("q")

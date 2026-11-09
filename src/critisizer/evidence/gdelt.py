@@ -15,6 +15,7 @@ from critisizer.evidence.query import MAX_RECORDS, TIMESPAN
 
 GDELT_URL = "https://api.gdeltproject.org/api/v2/doc/doc"
 MIN_GAP_SECONDS = 6.0
+RETRY_DELAYS = (0.0, 15.0, 30.0)  # seconds to wait before attempts 1, 2, 3
 
 
 class CollectError(Exception):
@@ -88,6 +89,8 @@ class GdeltClient:
     def _get(self, params: dict[str, str]) -> str:
         self._wait()
         response = self._http.get(GDELT_URL, params=params)
+        if response.status_code == 429:
+            raise CollectError("rate_limited")
         response.raise_for_status()
         return response.text
 
@@ -100,9 +103,12 @@ class GdeltClient:
             "timespan": TIMESPAN,
             "sort": "hybridrel",
         }
-        body = self._get(params)
-        try:
-            return body, parse_articles(body)
-        except CollectError:
-            body = self._get(params)  # one retry, after the polite gap
-            return body, parse_articles(body)
+        for delay in RETRY_DELAYS:
+            if delay:
+                self._sleep(delay)
+            try:
+                body = self._get(params)
+                return body, parse_articles(body)
+            except CollectError:
+                continue  # rate-limit notice or 429: wait longer, try again
+        raise CollectError("gave_up")
