@@ -49,13 +49,17 @@ def load_active_rubric(session: Session) -> Rubric:
 
 
 def scored_policy_ids(session: Session) -> set[int]:
-    """Policies with at least one indicator. The rest are 'not yet scored'."""
-    return set(session.scalars(select(Indicator.policy_id).distinct()))
+    """Policies with at least one approved indicator. The rest are 'not yet
+    scored'. Drafts never count until a reviewer approves them."""
+    approved = select(Indicator.policy_id).where(Indicator.status == "approved")
+    return set(session.scalars(approved.distinct()))
 
 
 def _is_scored(session: Session, policy_id: int) -> bool:
     found = session.scalar(
-        select(Indicator.id).where(Indicator.policy_id == policy_id).limit(1)
+        select(Indicator.id)
+        .where(Indicator.policy_id == policy_id, Indicator.status == "approved")
+        .limit(1)
     )
     return found is not None
 
@@ -69,7 +73,9 @@ def indicator_multiplier(evidence: list[Evidence]) -> Decimal:
 def score_policy(session: Session, policy_id: int, rubric: Rubric) -> OverallResult:
     aspects = session.execute(select(Aspect.id, Aspect.code)).all()
     indicators = session.scalars(
-        select(Indicator).where(Indicator.policy_id == policy_id)
+        select(Indicator).where(
+            Indicator.policy_id == policy_id, Indicator.status == "approved"
+        )
     ).all()
     evidence = session.scalars(
         select(Evidence).where(Evidence.indicator_id.in_([i.id for i in indicators]))
@@ -90,7 +96,12 @@ def score_policy(session: Session, policy_id: int, rubric: Rubric) -> OverallRes
             for i in indicators
             if i.aspect_id == aspect_id
         ]
-        aspect_scores[code] = aspect_score(inputs)
+        if not inputs:
+            # No approved indicators for this aspect: nothing documented, counts 0.
+            aspect_scores[code] = Decimal(0)
+        else:
+            # Indicators exist: keep the strict rule (None if no valid evidence).
+            aspect_scores[code] = aspect_score(inputs)
 
     rating_rows = session.execute(
         select(Rating.value, Rating.status).where(Rating.policy_id == policy_id)
@@ -157,7 +168,9 @@ def build_policy_detail(
     result = score_policy(session, policy.id, rubric)
     aspects = session.scalars(select(Aspect).order_by(Aspect.id)).all()
     indicators = session.scalars(
-        select(Indicator).where(Indicator.policy_id == policy.id).order_by(Indicator.id)
+        select(Indicator)
+        .where(Indicator.policy_id == policy.id, Indicator.status == "approved")
+        .order_by(Indicator.id)
     ).all()
     evidence = session.scalars(
         select(Evidence)
