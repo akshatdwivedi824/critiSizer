@@ -1,11 +1,12 @@
-"""Fetch an article page and cut out only the passages that mention the policy."""
+"""Fetch an article page and keep its text, if it is actually about the policy."""
 
 from __future__ import annotations
 
 import trafilatura
 
-MAX_EXCERPT_CHARS = 1500
+MAX_EXCERPT_CHARS = 3000
 MIN_PARAGRAPH_CHARS = 40
+MIN_MENTIONS = 2
 
 
 def fetch_article_text(url: str) -> str | None:
@@ -18,18 +19,21 @@ def fetch_article_text(url: str) -> str | None:
 def make_excerpt(
     title: str, text: str, phrase: str, max_chars: int = MAX_EXCERPT_CHARS
 ) -> str | None:
-    """Title + the paragraphs that contain the phrase, capped. None if none do."""
+    """Title + the article's opening text, capped. None for a passing mention.
+
+    An article counts as being about the policy when the phrase is in the title
+    or appears at least MIN_MENTIONS times in the body.
+    """
     needle = phrase.casefold()
-    hits = [
-        p.strip()
-        for p in text.split("\n")
-        if len(p.strip()) >= MIN_PARAGRAPH_CHARS and needle in p.casefold()
+    paragraphs = [
+        p.strip() for p in text.split("\n") if len(p.strip()) >= MIN_PARAGRAPH_CHARS
     ]
-    if not hits:
+    mentions = sum(p.casefold().count(needle) for p in paragraphs)
+    if needle not in title.casefold() and mentions < MIN_MENTIONS:
         return None
     chosen: list[str] = []
     used = 0
-    for paragraph in hits:
+    for paragraph in paragraphs:
         room = max_chars - used
         if room <= 0:
             break

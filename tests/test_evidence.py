@@ -37,7 +37,7 @@ GDELT_BODY = json.dumps(
     }
 )
 
-LONG = "The Agnipath scheme was announced in 2022 and changed army recruitment. "
+LONG = "The Agnipath scheme was announced in 2022 and, under Agnipath, army recruitment changed. "
 PAGES = {
     HT: "Intro line that is short.\n" + LONG + "More detail follows here.",
     TOI: LONG + "States reserve posts for former recruits under it.",
@@ -223,3 +223,9 @@ def test_client_gives_up_after_three_attempts():
     client = GdeltClient(http=http, sleep=lambda s: None, clock=lambda: 100.0)
     with pytest.raises(CollectError):
         client.search("q")
+
+
+def test_passing_mention_is_not_an_excerpt():
+    text = "A long article about Nepal and Gulf jobs that mentions Agnipath once only."
+    assert make_excerpt("Veterans angry", text, "Agnipath") is None
+    assert make_excerpt("Agnipath explained", text, "Agnipath") is not None
