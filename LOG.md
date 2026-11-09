@@ -1,4 +1,4 @@
-# critiSizer log
+﻿# critiSizer log
 
 ## Day 1 to 5
 (for each day: what I built, what went wrong, one thing I learned)
@@ -117,3 +117,9 @@ snapshot later.]
 - Found and fixed: partial aspect coverage crashed scoring. Aspects with no indicators now count 0; indicators with only allegations are still rejected.
 - 132 tests passing.
 
+## Day 17 (Mon 9 Nov)
+- Evidence collection: fixed query_v1 (per-policy phrases, outlet allow-list), GDELT client with rate-limit backoff, article text extraction (trafilatura), excerpt rule (article must be about the policy), storage in source_items with dedupe, floor of 3 excerpts from 2 outlets.
+- GDELT throttled our IP after repeated requests (429); added backoff and a replay client with a saved sample so development does not depend on it.
+- Finding: 3-month news search yields current-events coverage, not much documented harm. Plan a second source (audits, court rulings) after the Day 19 hand-score comparison.
+- Not yet done: first real end-to-end GDELT collection (waiting out throttle).
+- 149 tests passing.
