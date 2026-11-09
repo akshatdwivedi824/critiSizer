@@ -112,3 +112,8 @@ snapshot later.]
    - A stranger would not understand from the README: [your answer, for example
      what "verification multiplier" means, or how the people's rating is gated].
    - I want to learn next: [your answer].
+## Day 16 (Mon 9 Nov)
+- Frozen scoring method + prompt_v1, scorer interface, quote verifier, FakeScorer, draft storage (drafts never count until approved).
+- Found and fixed: partial aspect coverage crashed scoring. Aspects with no indicators now count 0; indicators with only allegations are still rejected.
+- 132 tests passing.
+
