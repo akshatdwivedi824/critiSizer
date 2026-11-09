@@ -123,3 +123,9 @@ snapshot later.]
 - Finding: 3-month news search yields current-events coverage, not much documented harm. Plan a second source (audits, court rulings) after the Day 19 hand-score comparison.
 - Not yet done: first real end-to-end GDELT collection (waiting out throttle).
 - 149 tests passing.
+
+## Day 18 (Mon 9 Nov)
+- Job queue in Postgres (jobs table): enqueue with dedupe, claim with SKIP LOCKED, retry with delay, give up after 3 attempts, recover stuck jobs.
+- Worker (python -m critisizer.worker --once / --enqueue-all); crashing handlers roll back partial writes; rate-limit failures wait 15 minutes.
+- GDELT kept returning 429 from this IP for 20+ minutes with no requests; the live end-to-end run is postponed to the deployed server. Development uses the replay client.
+- 162 tests passing.
