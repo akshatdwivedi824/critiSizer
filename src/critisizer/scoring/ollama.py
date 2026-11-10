@@ -20,7 +20,7 @@ class OllamaScorer:
         self.name = f"ollama:{model}"
         self._model = model
         self._url = url
-        self._http = http or httpx.Client(timeout=600.0)
+        self._http = http or httpx.Client(timeout=240.0)
 
     def score(self, request: ScoringRequest) -> str:
         payload = {
@@ -28,7 +28,7 @@ class OllamaScorer:
             "messages": [{"role": "user", "content": build_prompt(request)}],
             "stream": False,
             "format": "json",
-            "options": {"temperature": 0, "num_ctx": 8192},
+            "options": {"temperature": 0, "num_ctx": 8192, "num_predict": 1500},
         }
         try:
             response = self._http.post(self._url, json=payload)
