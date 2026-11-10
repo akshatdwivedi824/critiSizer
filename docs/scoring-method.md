@@ -120,3 +120,18 @@ scored.
 - Control result:
 - Mean gap to hand scores:
 
+## Version history
+
+- prompt_v2 (10 Nov 2026): prompt_v1 was tried once, on Demonetisation with the
+  local model qwen2.5:7b. Of 3 indicators drafted, 2 were rejected only because
+  their quotes exceeded 300 characters. The limit was stated in v1 but inside a
+  parenthesis. v2 states it as its own sentence. No other wording changed. The
+  prompt is frozen again at v2 before any hosted-model run.
+
+- prompt_v3 (10 Nov 2026): prompt_v2 was tried with qwen2.5:7b and failed
+  again (0 of 3 indicators accepted: over-long quotes and an altered quote).
+  Small models cannot reliably copy text exactly. v3 removes the copying:
+  sources are shown as numbered sentences, the model cites a source and a
+  sentence number, and code copies the sentence in as the quote. The verifier
+  is unchanged. A cited sentence can still fail to support the claim, which is
+  what the human review step is for.

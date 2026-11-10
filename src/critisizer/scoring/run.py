@@ -18,6 +18,7 @@ from critisizer.evidence.outlets import outlet_for
 from critisizer.models import Policy, SourceItem
 from critisizer.scoring import hosted, ollama
 from critisizer.scoring.cache import CachedScorer
+from critisizer.scoring.citations import resolve_citations
 from critisizer.scoring.contract import (
     Scorer,
     ScorerError,
@@ -43,7 +44,7 @@ class ScoreReport:
 
 
 def hand_scores_ready(path: Path | None = None) -> bool:
-    """Our own scores must be written (no '__' blanks left) before a real model runs."""
+    """Our baseline scores must be written (no '__' blanks) before a real model runs."""
     target = path or HAND_SCORES
     if not target.exists():
         return False
@@ -83,12 +84,16 @@ def score_policy_excerpts(
         return ScoreReport("not_enough_evidence")
     excerpts = load_excerpts(session, policy.id)
     request = ScoringRequest(policy.name, policy.year, excerpts)
-    raw = scorer.score(request)
+    raw = resolve_citations(scorer.score(request), excerpts)
     try:
         result = verify_answer(raw, excerpts)
     except AnswerError as exc:
         raise ScorerError("bad_answer") from exc
-    store_drafts(session, policy.id, result.accepted, excerpts, scorer.name, PROMPT_VERSION)
+    for item in result.rejected:
+        logger.info("rejected: %s", item)
+    store_drafts(
+        session, policy.id, result.accepted, excerpts, scorer.name, PROMPT_VERSION
+    )
     return ScoreReport("scored", len(result.accepted), len(result.rejected))
 
 
@@ -117,7 +122,9 @@ def make_scorer(kind: str, model: str | None = None) -> Scorer:
 def main(argv: list[str] | None = None) -> None:
     parser = argparse.ArgumentParser(prog="critisizer.scoring.run")
     parser.add_argument("--slug", required=True)
-    parser.add_argument("--scorer", choices=["fake", "ollama", "anthropic"], required=True)
+    parser.add_argument(
+        "--scorer", choices=["fake", "ollama", "anthropic"], required=True
+    )
     parser.add_argument("--model")
     args = parser.parse_args(argv)
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(message)s")
@@ -135,7 +142,10 @@ def main(argv: list[str] | None = None) -> None:
         raise SystemExit(1) from exc
     logger.info(
         "%s: %s (accepted %d, rejected %d)",
-        args.slug, report.status, report.accepted, report.rejected,
+        args.slug,
+        report.status,
+        report.accepted,
+        report.rejected,
     )
 
 

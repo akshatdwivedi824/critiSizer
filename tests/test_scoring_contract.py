@@ -136,8 +136,10 @@ def test_one_bad_indicator_does_not_sink_the_good_one():
 def test_prompt_has_the_policy_and_numbered_excerpts():
     prompt = build_prompt(ScoringRequest("Test policy", 2024, EXCERPTS))
     assert "Policy: Test policy (2024)" in prompt
-    assert "[1] Example Times, 2024-03-01: The audit found" in prompt
-    assert "[2] Example Gazette, undated: The court ruled" in prompt
+    assert "[1] Example Times, 2024-03-01:" in prompt
+    assert "(1) The audit found" in prompt
+    assert "[2] Example Gazette, undated:" in prompt
+    assert "(1) The court ruled" in prompt
     assert "{excerpts}" not in prompt
     assert "{policy_name}" not in prompt
 
@@ -184,7 +186,9 @@ def test_drafts_are_saved_with_their_quotes_but_never_counted(client, session, a
     stored = store_fake_drafts(session, "drafted")
     assert len(stored) == 2
     assert all(i.status == "ai_draft" for i in stored)
-    assert all(i.model == "fake" and i.prompt_version == "prompt_v1" for i in stored)
+    assert all(
+        i.model == "fake" and i.prompt_version == PROMPT_VERSION for i in stored
+    )
     assert len(session.scalars(select(Evidence)).all()) == 2
 
     body = client.get("/api/policies/drafted").json()

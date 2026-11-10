@@ -1,14 +1,19 @@
 from pathlib import Path
 
 from critisizer.scoring.contract import ScoringRequest, SourceExcerpt
+from critisizer.scoring.sentences import split_sentences
 
-PROMPT_VERSION = "prompt_v1"
-_TEMPLATE = Path(__file__).parent / "prompts" / "score_v1.txt"
+PROMPT_VERSION = "prompt_v3"
+_TEMPLATE = Path(__file__).parent / "prompts" / "score_v3.txt"
 
 
 def format_excerpt(item: SourceExcerpt) -> str:
+    """One source, its sentences numbered so the model can cite by number."""
     date = item.published or "undated"
-    return f"[{item.id}] {item.outlet}, {date}: {' '.join(item.text.split())}"
+    lines = [f"[{item.id}] {item.outlet}, {date}:"]
+    for number, sentence in enumerate(split_sentences(item.text), start=1):
+        lines.append(f"  ({number}) {sentence}")
+    return "\n".join(lines)
 
 
 def build_prompt(request: ScoringRequest) -> str:
