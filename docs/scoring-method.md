@@ -1,4 +1,4 @@
-# Scoring method (version 1)
+﻿# Scoring method (version 1)
 
 This document is frozen before any policy is scored. A change to the rules
 below means a new version number and a full re-score of every policy.
@@ -70,8 +70,15 @@ scored.
 
 ## Evidence collection
 
-- One query template per version, the same for every policy (the `query_v1`
-  entry in the code).
+- One query template per version, the same for every policy. Each policy has a
+  fixed list of search phrases, including the names the press actually uses
+  (for example "DPDP" as well as "Digital Personal Data Protection"). The
+  template and the phrase lists live in `query.py` and are reviewed by hand.
+  Changing either one means a new version number (currently `query_v2`).
+- An article is kept only if it is about the policy: a search phrase is in its
+  title, or phrases appear at least twice in the text. Passing mentions are
+  dropped. Of each kept article we store the title and the opening text, capped
+  at 3,000 characters. Pages we cannot read are skipped and never guessed at.
 - A fixed list of allowed outlets, committed in the repository.
 - A policy needs at least 3 distinct source excerpts from at least 2 outlets
   before it is scored. Below that, it is shown as "Not yet scored".
@@ -112,3 +119,4 @@ scored.
 - Spread (flagged aspects):
 - Control result:
 - Mean gap to hand scores:
+

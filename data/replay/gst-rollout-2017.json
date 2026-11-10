@@ -1,0 +1,32 @@
+{
+ "articles": [
+  {
+   "url": "https://scroll.in/article/851917/scroll_in",
+   "title": "GST rollout: Scroll",
+   "domain": "scroll.in",
+   "language": "English",
+   "sourcecountry": "India"
+  },
+  {
+   "url": "https://www.tribuneindia.com/news/archive/features/miles-away-from-one-nation-one-tax-489432",
+   "title": "Miles away from one nation, one tax",
+   "domain": "tribuneindia.com",
+   "language": "English",
+   "sourcecountry": "India"
+  },
+  {
+   "url": "https://theprint.in/opinion/smes-gst-mountain-need-support/11595",
+   "title": "SMEs' GST mountain: need support",
+   "domain": "theprint.in",
+   "language": "English",
+   "sourcecountry": "India"
+  },
+  {
+   "url": "https://thewire.in/economy/balancing-reform-and-reality-the-gst-dilemma-for-msmes",
+   "title": "Balancing reform and reality: the GST dilemma for MSMEs",
+   "domain": "thewire.in",
+   "language": "English",
+   "sourcecountry": "India"
+  }
+ ]
+}

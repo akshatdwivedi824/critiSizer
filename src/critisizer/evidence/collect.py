@@ -13,7 +13,7 @@ from sqlalchemy.orm import Session
 
 from critisizer.evidence.gdelt import GdeltClient
 from critisizer.evidence.outlets import outlet_for
-from critisizer.evidence.query import QUERY_VERSION, build_query, search_phrase
+from critisizer.evidence.query import QUERY_VERSION, build_query, search_phrases
 from critisizer.evidence.text import fetch_article_text, make_excerpt
 from critisizer.models import EvidenceRun, Policy, SourceItem
 
@@ -36,8 +36,8 @@ def collect_for_policy(
     client: GdeltClient,
     fetch: Callable[[str], str | None] = fetch_article_text,
 ) -> CollectReport:
-    phrase = search_phrase(policy.name, policy.slug)
-    query = build_query(phrase)
+    phrases = search_phrases(policy.name, policy.slug)
+    query = build_query(phrases)
     raw, articles = client.search(query)
 
     run = EvidenceRun(
@@ -78,7 +78,7 @@ def collect_for_policy(
         if not text:
             report.skipped["fetch_failed"] += 1
             continue
-        excerpt = make_excerpt(article.title, text, phrase)
+        excerpt = make_excerpt(article.title, text, phrases)
         if excerpt is None:
             report.skipped["no_mention"] += 1
             continue

@@ -69,7 +69,7 @@ def policy(session):
 
 
 def test_query_is_fixed():
-    assert QUERY_VERSION == "query_v1"
+    assert QUERY_VERSION == "query_v2"
     query = build_query("Agnipath")
     assert query == build_query("Agnipath")
     assert query.startswith('"Agnipath" sourcelang:english')
@@ -229,3 +229,20 @@ def test_passing_mention_is_not_an_excerpt():
     text = "A long article about Nepal and Gulf jobs that mentions Agnipath once only."
     assert make_excerpt("Veterans angry", text, "Agnipath") is None
     assert make_excerpt("Agnipath explained", text, "Agnipath") is not None
+
+
+def test_us_and_uk_spellings_match():
+    text = "A long paragraph on why demonetization hurt small traders badly. " * 2
+    assert make_excerpt("Cash ban", text, "Demonetisation") is not None
+
+
+def test_several_phrases_are_or_ed_in_the_query():
+    query = build_query(("DPDP", "Digital Personal Data Protection"))
+    assert query.startswith('("DPDP" OR "Digital Personal Data Protection")')
+
+
+def test_any_alias_counts_as_a_mention():
+    text = "A long paragraph about how the DPDP Act treats journalists and RTI. " * 2
+    phrases = ("Digital Personal Data Protection", "DPDP")
+    assert make_excerpt("Data law", text, phrases) is not None
+    assert make_excerpt("Data law", text, "Digital Personal Data Protection") is None
