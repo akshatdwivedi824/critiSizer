@@ -12,6 +12,7 @@ from critisizer.models import (
     Rating,
     RubricVersion,
     RubricWeight,
+    SourceItem,
 )
 from critisizer.schemas import (
     AspectScoreOut,
@@ -158,29 +159,32 @@ def build_policy_summary(
 def build_policy_detail(
     session: Session, policy: Policy, rubric: Rubric
 ) -> PolicyDetail:
+    aspects = session.scalars(select(Aspect).order_by(Aspect.id)).all()
     if not _is_scored(session, policy.id):
         return PolicyDetail(
             **_unscored_fields(policy),
             rubric_label=rubric.label,
             expert_average=None,
             aspects=[],
+            aspects_reviewed=0,
+            aspects_total=len(aspects),
         )
     result = score_policy(session, policy.id, rubric)
-    aspects = session.scalars(select(Aspect).order_by(Aspect.id)).all()
     indicators = session.scalars(
         select(Indicator)
         .where(Indicator.policy_id == policy.id, Indicator.status == "approved")
         .order_by(Indicator.id)
     ).all()
-    evidence = session.scalars(
-        select(Evidence)
+    evidence_rows = session.execute(
+        select(Evidence, SourceItem.outlet)
+        .outerjoin(SourceItem, SourceItem.id == Evidence.source_item_id)
         .where(Evidence.indicator_id.in_([i.id for i in indicators]))
         .order_by(Evidence.id)
     ).all()
 
-    ev_by_ind: dict[int, list[Evidence]] = {}
-    for ev in evidence:
-        ev_by_ind.setdefault(ev.indicator_id, []).append(ev)
+    ev_by_ind: dict[int, list[tuple[Evidence, str | None]]] = {}
+    for ev, outlet in evidence_rows:
+        ev_by_ind.setdefault(ev.indicator_id, []).append((ev, outlet))
 
     aspect_out = []
     for aspect in aspects:
@@ -190,6 +194,8 @@ def build_policy_detail(
                 description=ind.description,
                 score=float(ind.score),
                 weight=float(ind.weight),
+                model=ind.model,
+                prompt_version=ind.prompt_version,
                 evidence=[
                     EvidenceOut(
                         source_url=ev.source_url,
@@ -197,8 +203,10 @@ def build_policy_detail(
                         source_tier=ev.source_tier,
                         multiplier=float(ev.verification_multiplier),
                         excluded=ev.verification_multiplier == 0,
+                        quote=ev.quote,
+                        outlet=outlet,
                     )
-                    for ev in ev_by_ind.get(ind.id, [])
+                    for ev, outlet in ev_by_ind.get(ind.id, [])
                 ],
             )
             for ind in indicators
@@ -218,4 +226,6 @@ def build_policy_detail(
         rubric_label=result.rubric_label,
         expert_average=_r(result.expert_average),
         aspects=aspect_out,
+        aspects_reviewed=sum(1 for a in aspect_out if a.indicators),
+        aspects_total=len(aspect_out),
     )

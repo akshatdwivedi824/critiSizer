@@ -2,6 +2,8 @@ from datetime import date, datetime
 
 from pydantic import BaseModel
 
+REVIEW_NOTE = "AI-drafted, human-reviewed"
+
 
 class EvidenceOut(BaseModel):
     source_url: str
@@ -9,6 +11,8 @@ class EvidenceOut(BaseModel):
     source_tier: int
     multiplier: float
     excluded: bool
+    quote: str | None = None
+    outlet: str | None = None
 
 
 class IndicatorOut(BaseModel):
@@ -17,6 +21,8 @@ class IndicatorOut(BaseModel):
     score: float
     weight: float
     evidence: list[EvidenceOut]
+    model: str | None = None
+    prompt_version: str | None = None
 
 
 class AspectScoreOut(BaseModel):
@@ -43,6 +49,11 @@ class PolicyDetail(PolicySummary):
     rubric_label: str
     expert_average: float | None
     aspects: list[AspectScoreOut]
+    # How much of the scorecard a human has reviewed. An aspect with no approved
+    # indicator counts as 0, so a low number can mean "not reviewed yet".
+    aspects_reviewed: int = 0
+    aspects_total: int = 0
+    review_note: str = REVIEW_NOTE
 
 
 class SnapshotOut(BaseModel):
