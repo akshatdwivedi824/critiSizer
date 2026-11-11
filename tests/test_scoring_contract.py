@@ -189,9 +189,7 @@ def test_drafts_are_saved_with_their_quotes_but_never_counted(client, session, a
     stored = store_fake_drafts(session, "drafted")
     assert len(stored) == 2
     assert all(i.status == "ai_draft" for i in stored)
-    assert all(
-        i.model == "fake" and i.prompt_version == PROMPT_VERSION for i in stored
-    )
+    assert all(i.model == "fake" and i.prompt_version == PROMPT_VERSION for i in stored)
     assert len(session.scalars(select(Evidence)).all()) == 2
 
     body = client.get("/api/policies/drafted").json()
@@ -207,7 +205,11 @@ def test_approved_drafts_start_to_count(client, session, aspects):
     session.flush()
     body = client.get("/api/policies/approved-one").json()
     assert body["scored"] is True
-    assert body["overall_rating"] > 0
+    # The fake drafts do not cover every aspect, so the policy is not fully
+    # resolved and gets no overall rating yet.
+    assert body["rated"] is False
+    assert body["overall_rating"] is None
+    assert body["aspects_resolved"] > 0
 
 
 def test_storing_twice_replaces_the_earlier_drafts(session, aspects):
@@ -222,10 +224,13 @@ def test_storing_twice_replaces_the_earlier_drafts(session, aspects):
     assert len(count.all()) == 2
 
 
-def test_partial_aspect_coverage_still_scores(client, session, aspects):
+def test_partial_aspect_coverage_gives_no_overall_rating(client, session, aspects):
     for indicator in store_fake_drafts(session, "partial"):
         indicator.status = "approved"
     session.flush()
     body = client.get("/api/policies/partial").json()
     assert body["scored"] is True
-    assert 0 < body["overall_rating"] <= 100
+    assert body["rated"] is False
+    assert body["overall_rating"] is None
+    scores = [a["score"] for a in body["aspects"] if a["score"] is not None]
+    assert scores and all(0 <= s <= 100 for s in scores)

@@ -28,8 +28,12 @@ class IndicatorOut(BaseModel):
 class AspectScoreOut(BaseModel):
     code: str
     name: str
-    score: float
+    # None while the aspect is unresolved. 0.0 with status
+    # "no_negative_evidence" means a reviewer found none in the collected sources.
+    score: float | None
     indicators: list[IndicatorOut]
+    status: str = "unresolved"
+    review_reason: str | None = None
 
 
 class PolicySummary(BaseModel):
@@ -37,7 +41,12 @@ class PolicySummary(BaseModel):
     name: str
     year: int
     summary: str | None
+    # True once at least one aspect is resolved.
     scored: bool = True
+    # True only when all aspects are resolved; the overall rating exists only then.
+    rated: bool = False
+    aspects_resolved: int = 0
+    aspects_total: int = 0
     overall_rating: float | None
     spike_flag: bool
     people_rating: float | None
@@ -49,10 +58,11 @@ class PolicyDetail(PolicySummary):
     rubric_label: str
     expert_average: float | None
     aspects: list[AspectScoreOut]
-    # How much of the scorecard a human has reviewed. An aspect with no approved
-    # indicator counts as 0, so a low number can mean "not reviewed yet".
+    # Aspects that have at least one approved indicator.
     aspects_reviewed: int = 0
-    aspects_total: int = 0
+    # How much collected material the numbers rest on.
+    source_count: int = 0
+    outlet_count: int = 0
     review_note: str = REVIEW_NOTE
 
 

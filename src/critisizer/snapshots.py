@@ -9,7 +9,7 @@ from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.orm import Session
 
 from critisizer.models import Policy, RubricVersion, ScoreSnapshot
-from critisizer.scorecard import load_active_rubric, score_policy, scored_policy_ids
+from critisizer.scorecard import load_active_rubric, policy_progress, score_policy
 from critisizer.scoring.engine import OverallResult, ScoringError
 
 log = logging.getLogger(__name__)
@@ -29,6 +29,7 @@ class SnapshotReport:
     skipped: int = 0
     failed: int = 0
     unscored: int = 0
+    unrated: int = 0
 
 
 def _values(policy_id: int, version_id: int, week: date, result: OverallResult) -> dict:
@@ -51,12 +52,13 @@ def _values(policy_id: int, version_id: int, week: date, result: OverallResult) 
 def take_snapshots(
     session: Session, week: date, replace: bool = False
 ) -> SnapshotReport:
-    """Store each scored policy's current scores for `week`. The caller commits.
+    """Store each rated policy's current scores for `week`. The caller commits.
 
-    A policy with no indicators is not yet scored and gets no snapshot, so the
-    history never holds a made-up zero. An existing snapshot for the same
-    (policy, rubric version, week) is left alone unless replace=True. A policy
-    that fails scoring is logged and skipped; it never stops the others.
+    A policy with no resolved aspect is not yet scored, and one with some
+    unresolved aspects is not yet rated; neither gets a snapshot, so the history
+    never holds a number that meant "partly reviewed". An existing snapshot for
+    the same (policy, rubric version, week) is left alone unless replace=True. A
+    policy that fails scoring is logged and skipped; it never stops the others.
     """
     if week != week_start(week):
         raise ValueError(f"week must be a Monday, got {week} ({week:%A})")
@@ -67,11 +69,14 @@ def take_snapshots(
     ).one()
 
     report = SnapshotReport()
-    scored_ids = scored_policy_ids(session)
     policies = session.scalars(select(Policy).order_by(Policy.id)).all()
     for policy in policies:
-        if policy.id not in scored_ids:
+        progress = policy_progress(session, policy.id)
+        if progress.resolved == 0:
             report.unscored += 1
+            continue
+        if not progress.rated:
+            report.unrated += 1
             continue
         try:
             result = score_policy(session, policy.id, rubric)

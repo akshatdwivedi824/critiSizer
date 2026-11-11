@@ -121,6 +121,34 @@ class Indicator(Base):
     prompt_version: Mapped[str | None] = mapped_column(String(50))
 
 
+class AspectReview(Base):
+    """A reviewer's recorded finding that an aspect has no negative evidence in
+    the collected sources. Without this row or an approved indicator, the
+    aspect is unresolved and the policy gets no overall rating."""
+
+    __tablename__ = "aspect_reviews"
+    __table_args__ = (
+        UniqueConstraint(
+            "policy_id", "aspect_id", name="uq_aspect_reviews_policy_aspect"
+        ),
+        CheckConstraint(
+            "outcome IN ('no_negative_evidence')",
+            name="ck_aspect_reviews_outcome_allowed",
+        ),
+    )
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    policy_id: Mapped[int] = mapped_column(
+        ForeignKey("policies.id", ondelete="CASCADE"), index=True
+    )
+    aspect_id: Mapped[int] = mapped_column(ForeignKey("aspects.id"))
+    outcome: Mapped[str] = mapped_column(String(30))
+    reason: Mapped[str] = mapped_column(Text)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now()
+    )
+
+
 class Evidence(Base):
     __tablename__ = "evidence"
     __table_args__ = (
