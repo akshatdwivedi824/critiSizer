@@ -88,10 +88,16 @@ class GdeltClient:
 
     def _get(self, params: dict[str, str]) -> str:
         self._wait()
-        response = self._http.get(GDELT_URL, params=params)
+        try:
+            response = self._http.get(GDELT_URL, params=params)
+        except httpx.TransportError as exc:  # dropped connection, timeout, DNS
+            raise CollectError("network") from exc
         if response.status_code == 429:
             raise CollectError("rate_limited")
-        response.raise_for_status()
+        try:
+            response.raise_for_status()
+        except httpx.HTTPStatusError as exc:
+            raise CollectError(f"http_{response.status_code}") from exc
         return response.text
 
     def search(self, query: str) -> tuple[str, list[Article]]:
