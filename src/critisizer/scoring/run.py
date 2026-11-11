@@ -17,7 +17,7 @@ from critisizer.db import SessionLocal
 from critisizer.evidence.collect import enough_to_score
 from critisizer.evidence.outlets import outlet_for
 from critisizer.models import Policy, SourceItem
-from critisizer.scoring import hosted, ollama
+from critisizer.scoring import gemini, hosted, ollama
 from critisizer.scoring.cache import CachedScorer
 from critisizer.scoring.citations import resolve_citations
 from critisizer.scoring.contract import (
@@ -38,6 +38,8 @@ logger = logging.getLogger("critisizer.scoring")
 HAND_SCORES = Path("docs/hand-scores.md")
 DEFAULT_TOKEN_BUDGET = 150_000
 MAX_PER_ASPECT = 3  # a looping model cannot flood one aspect
+# Errors that mean "stop asking today": more calls would only be refused.
+QUOTA_ERRORS = {"gemini_http_429", "daily_cap_reached", "budget_exhausted"}
 
 
 @dataclass
@@ -53,7 +55,9 @@ class AspectOutcome:
     # "accepted": at least one draft passed the verifier
     # "none": the model said there is no finding for this aspect
     # "rejected": the model gave findings but all failed verification
-    # "failed": no usable answer (timeout, bad JSON, budget)
+    # "failed": no usable answer (timeout, bad JSON)
+    # "quota": the scorer's quota or budget ran out on this aspect
+    # "skipped": not asked, because an earlier aspect hit the quota
     status: str
     accepted: int = 0
     rejected: int = 0
@@ -159,7 +163,8 @@ def _score_one_aspect(
         raw = scorer.score(request)
     except ScorerError as exc:
         logger.warning("%s: scorer failed (%s)", code, exc)
-        return AspectOutcome(code, "failed"), []
+        status = "quota" if str(exc) in QUOTA_ERRORS else "failed"
+        return AspectOutcome(code, status), []
     raw = force_aspect(resolve_citations(raw, excerpts), code)
     try:
         items = parse_answer(raw)
@@ -182,13 +187,19 @@ def score_policy_by_aspect(
     session: Session, policy: Policy, scorer: Scorer
 ) -> AspectReport:
     """One call per aspect (prompt_v4). All accepted drafts are stored together,
-    because storing replaces earlier drafts of the same model and prompt version."""
+    because storing replaces earlier drafts of the same model and prompt version.
+    If the scorer's quota runs out, the remaining aspects are skipped, so a rerun
+    later can fill them in without hammering the service."""
     if not enough_to_score(session, policy.id):
         return AspectReport("not_enough_evidence")
     excerpts = load_excerpts(session, policy.id)
     outcomes: list[AspectOutcome] = []
     drafts: list[IndicatorDraft] = []
+    stopped = False
     for code in ASPECT_CODES:
+        if stopped:
+            outcomes.append(AspectOutcome(code, "skipped"))
+            continue
         outcome, accepted = _score_one_aspect(policy, scorer, excerpts, code)
         outcomes.append(outcome)
         drafts.extend(accepted)
@@ -199,7 +210,10 @@ def score_policy_by_aspect(
             outcome.accepted,
             outcome.rejected,
         )
-    if all(o.status == "failed" for o in outcomes):
+        if outcome.status == "quota":
+            stopped = True
+            logger.warning("quota reached: remaining aspects skipped, rerun later")
+    if all(o.status in ("failed", "quota", "skipped") for o in outcomes):
         raise ScorerError("all_aspects_failed")
     store_drafts(
         session, policy.id, drafts, excerpts, scorer.name, ASPECT_PROMPT_VERSION
@@ -224,6 +238,18 @@ def make_scorer(kind: str, model: str | None = None) -> Scorer:
             budget,
             model or hosted.DEFAULT_MODEL,
         )
+    elif kind == "gemini":
+        ledger = gemini.CallLedger(
+            gemini.CALL_LEDGER,
+            int(
+                os.environ.get(
+                    "CRITISIZER_GEMINI_DAILY_CAP", gemini.DEFAULT_DAILY_CAP
+                )
+            ),
+        )
+        inner = gemini.GeminiScorer(
+            gemini.load_api_key(), ledger, model or gemini.DEFAULT_MODEL
+        )
     else:
         raise ScorerError("unknown_scorer")
     return CachedScorer(inner)
@@ -233,7 +259,9 @@ def main(argv: list[str] | None = None) -> None:
     parser = argparse.ArgumentParser(prog="critisizer.scoring.run")
     parser.add_argument("--slug", required=True)
     parser.add_argument(
-        "--scorer", choices=["fake", "ollama", "anthropic"], required=True
+        "--scorer",
+        choices=["fake", "ollama", "anthropic", "gemini"],
+        required=True,
     )
     parser.add_argument("--model")
     parser.add_argument("--mode", choices=["aspect", "single"], default="aspect")

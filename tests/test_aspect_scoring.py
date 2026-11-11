@@ -216,3 +216,16 @@ def test_prompt_without_an_aspect_is_still_the_single_pass_prompt():
 def test_unknown_aspect_is_refused():
     with pytest.raises(ValueError):
         build_prompt(_request("made_up"))
+
+
+def test_a_quota_error_stops_the_policy_but_keeps_earlier_drafts(session, policy):
+    add_sources(session, policy)
+    answers = all_none()
+    answers["outcome_failure"] = answer(finding(aspect="outcome_failure"))
+    answers["cost_waste"] = ScorerError("gemini_http_429")
+    scorer = ScriptedScorer(answers)
+    report = score_policy_by_aspect(session, policy, scorer)
+    assert scorer.seen == ["outcome_failure", "cost_waste"]
+    statuses = [o.status for o in report.outcomes]
+    assert statuses == ["accepted", "quota", "skipped", "skipped", "skipped", "skipped"]
+    assert stored_aspects(session) == ["outcome_failure"]
