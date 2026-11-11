@@ -3,9 +3,10 @@
 from __future__ import annotations
 
 import argparse
+import json
 import logging
 import os
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 from urllib.parse import urlparse
 
@@ -20,6 +21,8 @@ from critisizer.scoring import hosted, ollama
 from critisizer.scoring.cache import CachedScorer
 from critisizer.scoring.citations import resolve_citations
 from critisizer.scoring.contract import (
+    ASPECT_CODES,
+    IndicatorDraft,
     Scorer,
     ScorerError,
     ScoringRequest,
@@ -27,13 +30,14 @@ from critisizer.scoring.contract import (
 )
 from critisizer.scoring.drafts import store_drafts
 from critisizer.scoring.fake import FakeScorer
-from critisizer.scoring.prompt import PROMPT_VERSION
-from critisizer.scoring.verifier import AnswerError, verify_answer
+from critisizer.scoring.prompt import ASPECT_PROMPT_VERSION, PROMPT_VERSION
+from critisizer.scoring.verifier import AnswerError, parse_answer, verify_answer
 
 logger = logging.getLogger("critisizer.scoring")
 
 HAND_SCORES = Path("docs/hand-scores.md")
 DEFAULT_TOKEN_BUDGET = 150_000
+MAX_PER_ASPECT = 3  # a looping model cannot flood one aspect
 
 
 @dataclass
@@ -41,6 +45,37 @@ class ScoreReport:
     status: str  # "scored" or "not_enough_evidence"
     accepted: int = 0
     rejected: int = 0
+
+
+@dataclass
+class AspectOutcome:
+    aspect: str
+    # "accepted": at least one draft passed the verifier
+    # "none": the model said there is no finding for this aspect
+    # "rejected": the model gave findings but all failed verification
+    # "failed": no usable answer (timeout, bad JSON, budget)
+    status: str
+    accepted: int = 0
+    rejected: int = 0
+
+
+@dataclass
+class AspectReport:
+    status: str  # "scored" or "not_enough_evidence"
+    outcomes: list[AspectOutcome] = field(default_factory=list)
+
+    @property
+    def accepted(self) -> int:
+        return sum(o.accepted for o in self.outcomes)
+
+    @property
+    def rejected(self) -> int:
+        return sum(o.rejected for o in self.outcomes)
+
+    @property
+    def usable(self) -> int:
+        """Aspects where the model gave a well-formed, verified or empty answer."""
+        return sum(1 for o in self.outcomes if o.status in ("accepted", "none"))
 
 
 def hand_scores_ready(path: Path | None = None) -> bool:
@@ -80,6 +115,7 @@ def load_excerpts(session: Session, policy_id: int) -> list[SourceExcerpt]:
 def score_policy_excerpts(
     session: Session, policy: Policy, scorer: Scorer
 ) -> ScoreReport:
+    """The old single-pass method (prompt_v3). Kept so earlier runs can be repeated."""
     if not enough_to_score(session, policy.id):
         return ScoreReport("not_enough_evidence")
     excerpts = load_excerpts(session, policy.id)
@@ -95,6 +131,80 @@ def score_policy_excerpts(
         session, policy.id, result.accepted, excerpts, scorer.name, PROMPT_VERSION
     )
     return ScoreReport("scored", len(result.accepted), len(result.rejected))
+
+
+def force_aspect(raw: str, aspect: str) -> str:
+    """The code, not the model, decides which aspect an answer belongs to. Also
+    caps the number of indicators, so a looping model cannot flood one aspect."""
+    try:
+        data = json.loads(raw)
+    except ValueError:
+        return raw
+    items = data.get("indicators") if isinstance(data, dict) else None
+    if not isinstance(items, list):
+        return raw
+    items = items[:MAX_PER_ASPECT]
+    for item in items:
+        if isinstance(item, dict):
+            item["aspect"] = aspect
+    data["indicators"] = items
+    return json.dumps(data)
+
+
+def _score_one_aspect(
+    policy: Policy, scorer: Scorer, excerpts: list[SourceExcerpt], code: str
+) -> tuple[AspectOutcome, list[IndicatorDraft]]:
+    request = ScoringRequest(policy.name, policy.year, excerpts, aspect=code)
+    try:
+        raw = scorer.score(request)
+    except ScorerError as exc:
+        logger.warning("%s: scorer failed (%s)", code, exc)
+        return AspectOutcome(code, "failed"), []
+    raw = force_aspect(resolve_citations(raw, excerpts), code)
+    try:
+        items = parse_answer(raw)
+    except AnswerError as exc:
+        logger.warning("%s: unusable answer (%s)", code, exc)
+        return AspectOutcome(code, "failed"), []
+    if not items:
+        return AspectOutcome(code, "none"), []
+    result = verify_answer(raw, excerpts, (code,))
+    for item in result.rejected:
+        logger.info("rejected: %s", item)
+    status = "accepted" if result.accepted else "rejected"
+    outcome = AspectOutcome(
+        code, status, len(result.accepted), len(result.rejected)
+    )
+    return outcome, result.accepted
+
+
+def score_policy_by_aspect(
+    session: Session, policy: Policy, scorer: Scorer
+) -> AspectReport:
+    """One call per aspect (prompt_v4). All accepted drafts are stored together,
+    because storing replaces earlier drafts of the same model and prompt version."""
+    if not enough_to_score(session, policy.id):
+        return AspectReport("not_enough_evidence")
+    excerpts = load_excerpts(session, policy.id)
+    outcomes: list[AspectOutcome] = []
+    drafts: list[IndicatorDraft] = []
+    for code in ASPECT_CODES:
+        outcome, accepted = _score_one_aspect(policy, scorer, excerpts, code)
+        outcomes.append(outcome)
+        drafts.extend(accepted)
+        logger.info(
+            "  %-18s %-9s accepted=%d rejected=%d",
+            code,
+            outcome.status,
+            outcome.accepted,
+            outcome.rejected,
+        )
+    if all(o.status == "failed" for o in outcomes):
+        raise ScorerError("all_aspects_failed")
+    store_drafts(
+        session, policy.id, drafts, excerpts, scorer.name, ASPECT_PROMPT_VERSION
+    )
+    return AspectReport("scored", outcomes)
 
 
 def make_scorer(kind: str, model: str | None = None) -> Scorer:
@@ -126,6 +236,7 @@ def main(argv: list[str] | None = None) -> None:
         "--scorer", choices=["fake", "ollama", "anthropic"], required=True
     )
     parser.add_argument("--model")
+    parser.add_argument("--mode", choices=["aspect", "single"], default="aspect")
     args = parser.parse_args(argv)
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(message)s")
     try:
@@ -135,7 +246,12 @@ def main(argv: list[str] | None = None) -> None:
             if policy is None:
                 logger.error("no such policy: %s", args.slug)
                 raise SystemExit(1)
-            report = score_policy_excerpts(session, policy, scorer)
+            if args.mode == "single":
+                report: ScoreReport | AspectReport = score_policy_excerpts(
+                    session, policy, scorer
+                )
+            else:
+                report = score_policy_by_aspect(session, policy, scorer)
             session.commit()
     except ScorerError as exc:
         logger.error("scoring stopped: %s", exc)
@@ -147,6 +263,13 @@ def main(argv: list[str] | None = None) -> None:
         report.accepted,
         report.rejected,
     )
+    if isinstance(report, AspectReport) and report.outcomes:
+        logger.info(
+            "%s: usable aspect answers %d of %d",
+            args.slug,
+            report.usable,
+            len(report.outcomes),
+        )
 
 
 if __name__ == "__main__":

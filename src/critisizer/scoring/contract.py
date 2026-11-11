@@ -32,11 +32,15 @@ class SourceExcerpt:
 @dataclass(frozen=True)
 class ScoringRequest:
     """Everything a scorer may see. There is deliberately no field for the
-    policy's summary or stated aims: they must never reach the scorer."""
+    policy's summary or stated aims: they must never reach the scorer.
+
+    aspect is None for the old single-pass prompt (prompt_v3). When it is set,
+    the scorer is asked about that one aspect only (prompt_v4)."""
 
     policy_name: str
     policy_year: int
     excerpts: list[SourceExcerpt]
+    aspect: str | None = None
 
 
 @dataclass(frozen=True)

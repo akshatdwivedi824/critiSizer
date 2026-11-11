@@ -159,7 +159,10 @@ def test_text_inside_a_source_is_never_treated_as_a_placeholder():
 
 def test_the_scorer_request_has_no_place_for_aims_or_summary():
     names = {f.name for f in fields(ScoringRequest)}
-    assert names == {"policy_name", "policy_year", "excerpts"}
+    # "aspect" only says which single aspect to look for. It carries no policy text.
+    assert names == {"policy_name", "policy_year", "excerpts", "aspect"}
+    for forbidden in ("summary", "aims", "aim", "description", "intent"):
+        assert not any(forbidden in name for name in names)
 
 
 # --- fake scorer and storing drafts ------------------------------------------

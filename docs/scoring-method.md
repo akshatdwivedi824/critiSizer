@@ -135,3 +135,18 @@ scored.
   sentence number, and code copies the sentence in as the quote. The verifier
   is unchanged. A cited sentence can still fail to support the claim, which is
   what the human review step is for.
+
+### prompt_v4 (current): one aspect per call
+Why: the single-pass prompts (v1-v3) asked a 7B model to find findings across all
+six aspects at once. In the first real review, 5 of 12 drafts survived human
+review and most rejections were misfiled aspects or broken citations.
+What changed: each aspect is a separate call. The code, not the model, sets the
+aspect on every answer. "No finding" (an empty list) is a valid answer. At most
+3 indicators and 3 evidence items per call. Each prompt lists the valid
+sentence numbers per source. The prompt tells the model to ignore boilerplate,
+headlines, stated aims and calls for review. Scorer setting (not a prompt
+change): local client caps answers at 1,500 tokens, 240 s timeout.
+Pass bar (set before looking at results): at least 4 of 6 aspect calls usable
+on each of two test policies, and at least half of accepted drafts survive
+human review. If it fails, the next step is a larger or hosted model, not a
+looser verifier.
