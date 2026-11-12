@@ -129,3 +129,17 @@ snapshot later.]
 - Worker (python -m critisizer.worker --once / --enqueue-all); crashing handlers roll back partial writes; rate-limit failures wait 15 minutes.
 - GDELT kept returning 429 from this IP for 20+ minutes with no requests; the live end-to-end run is postponed to the deployed server. Development uses the replay client.
 - 162 tests passing.
+
+## Days 19–21: scoring quality, the rating rule, evidence reality check
+
+**Local model failed the quality bar.** qwen2.5:7b drafted indicators; on review only 2 of 7 survived (misfiled aspects, quotes taken from the policy's stated aims, headline quotes, duplicates). It also hung for 10 minutes once. Decision: stop using it for drafting. Free-only constraint means no paid models.
+
+**Switched to the Gemini free tier.** Per-aspect prompting (prompt_v4: one call per aspect, the code sets the aspect, "none found" is a valid answer) removed verifier rejections. Gemini 3.8-flash recovered the 5 known findings I had checked by hand. Precision was mixed: 33% strict / 67% on a second counting of the first batch (counting caveat noted when reported), 5 of 7 on a later batch. The Lite model produced more noise (wrong aspect, a sign reversal, restatements). Free-tier limits are tight (~20 requests/day inferred from 429s; real limits not yet read from AI Studio). The client has pacing, retries, a daily call ledger and a quota stop.
+
+**Rating rule fixed.** Before: an aspect with no approved indicator silently counted 0, so overall ratings were not comparable between policies. Now every aspect must be resolved: scored (approved indicator) or marked "no negative evidence found in the collected sources" by a reviewer (reason required, audited, needs 3 sources from 2 outlets, refused if the aspect has an approved indicator or a pending draft). The overall rating exists only when all six aspects are resolved; otherwise the page says "Under review: N of 6". Weekly snapshots skip unresolved policies. Pages show quotes, outlets and how many sources the rating rests on.
+
+**Evidence reality check.** The evidence on all 8 policies came from a hand-picked replay list (2–6 URLs each), not live GDELT, so "gathered automatically" was not yet true. After cleanup (JavaScript-notice pages, glued captions) several policies have 2–5 sources, so no policy is rated yet. A live GDELT run from this connection was throttled (429, dropped connection). GDELT's DOC API also only covers a rolling recent window, which may be thin for the older policies. Fallback: curated URL lists, with text still fetched and quoted verbatim, disclosed as editorially selected.
+
+**Extraction cleanup (text_v2).** Split sentences glued by captions, drop page furniture, keep initials intact, require the policy to be mentioned in the body. A reclean script applied this to stored rows.
+
+**Incidents.** A Gemini API key was pasted into a command twice (rotation not yet confirmed). A File Explorer move took the prompts folder out of place and failed 18 tests; restored from git and now guarded by a test.
