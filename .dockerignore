@@ -1,0 +1,16 @@
+.venv
+.git
+.env
+__pycache__
+.pytest_cache
+.ruff_cache
+.cache
+.coverage
+htmlcov
+backup-*.sql
+*-files.txt
+data
+tests
+docs
+LOG.md
+loadtest

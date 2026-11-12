@@ -25,5 +25,36 @@ services:
       timeout: 3s
       retries: 10
 
+  app:
+    build: .
+    image: critisizer:local
+    # Migrations run before the server starts.
+    command: sh -c "alembic upgrade head && exec uvicorn critisizer.main:app --host 0.0.0.0 --port 8000"
+    environment: &app_env
+      DATABASE_URL: postgresql+psycopg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+      REDIS_URL: redis://redis:6379/0
+      ADMIN_TOKEN: ${ADMIN_TOKEN}
+    ports:
+      - "127.0.0.1:8001:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health/ready', timeout=3)"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+
+  worker:
+    image: critisizer:local
+    command: python -m critisizer.worker
+    environment: *app_env
+    depends_on:
+      app:
+        condition: service_healthy
+
 volumes:
   pgdata:
