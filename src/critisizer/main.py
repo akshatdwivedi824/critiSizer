@@ -10,16 +10,25 @@ from critisizer.admin import router as admin_router
 from critisizer.api import router as api_router
 from critisizer.aspect_reviews import router as aspect_reviews_router
 from critisizer.deps import SessionDep
+from critisizer.observability import (
+    RequestLogMiddleware,
+    configure_logging,
+)
+from critisizer.observability import router as observability_router
 from critisizer.review import router as review_router
 from critisizer.web import router as web_router
 
+configure_logging()
+
 app = FastAPI(title="critiSizer")
+app.add_middleware(RequestLogMiddleware)
 app.include_router(web_router)
 app.include_router(api_router)
 app.include_router(accounts_router)
 app.include_router(admin_router)
 app.include_router(review_router)
 app.include_router(aspect_reviews_router)
+app.include_router(observability_router)
 
 
 @app.get("/health")

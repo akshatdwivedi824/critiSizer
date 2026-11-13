@@ -183,3 +183,22 @@ snapshot later.]
 - The free web service spins down after 15 minutes idle. Measured 13 Nov 2026:
   first request after idle took 73 s (includes container start, migration and
   seed); warm requests take 0.6-1.3 s.
+
+## Day 22 — Reviewed data export/import
+- src/critisizer/reviewed_data.py: export approved indicators with evidence,
+  approved aims, aspect reviews and source excerpts (cut to 500 characters) to
+  seed/reviewed.yaml; idempotent import creates and updates, never deletes.
+- scripts/seed.py loads the file at every boot, so a fresh database fills itself.
+- First import on the live site: 28 sources, 23 indicators, 43 evidence rows.
+  Live site now shows 2-3 of 6 aspects resolved per policy; none rated yet.
+- 7 new tests (round trip, repeat import creates nothing, unknown policy or
+  aspect fails loudly, excerpt cap).
+- Observability: src/critisizer/observability.py adds an X-Request-ID header, one
+  JSON log line per request (route as template, no query strings, bodies or auth
+  headers) and an admin-only /metrics endpoint (counts, statuses, cache hits,
+  average/p95/max latency per route; in memory, resets on spin-down). Health
+  checks are excluded.
+- Fixed migrations/env.py: Alembic's fileConfig disabled existing loggers in
+  tests (disable_existing_loggers=False). Tests file name must be lowercase
+  (test_*.py) or Linux CI will not collect it.
+- 13 new tests; full suite 286 passing.

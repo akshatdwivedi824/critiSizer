@@ -38,17 +38,15 @@ database, which is the source of truth. The hosted site serves reviewed results.
 - No secrets in git history or in the image (checked env and /app contents).
 
 ## Re-seed runbook
-1. Take a dump of the local database (see README).
-2. Create a new free Postgres, update DATABASE_URL, redeploy.
-3. Restore the dump into the new database. Render provides an External Database
-   URL for the free Postgres (verified 13 Nov 2026).
-4. Run scripts/smoke.py against the live URL.
-5. Delete the old database after the new one is confirmed.
+1. Review locally, then run `uv run python scripts/export_reviewed.py` and commit
+   `seed/reviewed.yaml` (excerpts are cut to 500 characters).
+2. Create a new free Postgres, set DATABASE_URL on the web service to its internal
+   URL (prefixed `postgresql+psycopg://`), and redeploy.
+3. The start script migrates and imports the reviewed data into the empty
+   database; no manual restore is needed. The External URL stays available as a
+   fallback for a dump restore.
+4. Run scripts/smoke.py and compare /api/policies with the local site.
+5. Delete the old database once the new one is confirmed.
 
-## Alternatives
-Fly.io and Railway were considered. Their current free-tier terms were not verified
-for this decision, so they are not ruled out on evidence.
-
-## Rollback
-Redeploy the previous image from the host's deploy history; the database schema
-changes are migrations with downgrades.
+Import only creates and updates, never deletes. Review on the local database only:
+the import overwrites rows it knows about on every boot.
