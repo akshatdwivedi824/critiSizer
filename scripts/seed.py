@@ -15,8 +15,10 @@ from critisizer.models import (
     RubricVersion,
     RubricWeight,
 )
+from critisizer.reviewed_data import import_reviewed
 
 DEFAULT_FILE = Path("seed/policies.yaml")
+REVIEWED_FILE = Path("seed/reviewed.yaml")
 
 
 def content_hash(url: str, text: str) -> str:
@@ -106,14 +108,21 @@ def load_policies(session, policies, by_code):
     return created
 
 
-def main(path: Path = DEFAULT_FILE) -> None:
+def main(path: Path = DEFAULT_FILE, reviewed: Path = REVIEWED_FILE) -> None:
     data = yaml.safe_load(path.read_text(encoding="utf-8"))
+    counts = None
     with SessionLocal() as session:
         by_code = get_or_create_aspects(session, data["aspects"])
         get_or_create_rubric(session, data["rubric"], data["aspects"], by_code)
         created = load_policies(session, data["policies"], by_code)
+        if reviewed.exists():
+            counts = import_reviewed(
+                session, yaml.safe_load(reviewed.read_text(encoding="utf-8"))
+            )
         session.commit()
     print(f"policies created: {created}")
+    if counts is not None:
+        print("reviewed data created: " + ", ".join(f"{k}={v}" for k, v in counts.items()))
 
 
 if __name__ == "__main__":
