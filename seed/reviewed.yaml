@@ -323,6 +323,25 @@ policies:
       quote: Not for the first time, the government’s elusive claims about the efficacy of demonetisation
         have been met with tangible data suggesting that the exercise failed to achieve its various goals.
       source_item: 57cba65afb2de539049bcdc65219f6fddd52c99b26d43fa6fea786946dca57ed
+  - aspect: transparency_gap
+    name: Derailment and delay of parliamentary report on demonetisation
+    score: 45.0
+    weight: 1.0
+    description: The ruling party used its majority in the parliamentary standing committee on finance
+      to derail discussion and delay the panel's final report on demonetisation.
+    model: gemini:gemini-3.5-flash-lite
+    prompt_version: prompt_v4
+    evidence:
+    - url: https://thewire.in/economy/how-successful-was-demonetisation-four-takeaways-from-the-rbis-annual-report
+      title: How successful was demonetisation? Four takeaways from the RBI's annual report
+      tier: 2
+      multiplier: 1.0
+      content_hash: b483bbb00524e570fcbdcc52cacbe869b06c329095c57058e16af80b409337c2
+      archived_location: null
+      quote: Earlier this week, for instance, multiple media reports noted that the BJP used its majority
+        in the parliamentary standing committee on finance to derail discussion and delay the panel’s
+        final report on demonetisation, which is reportedly extremely critical of the note-ban exercise.
+      source_item: b371f4481684e054a06cb42dcdfb4593397120a9c02b16b429bbeed5e784dd59
   aspect_reviews: []
 - slug: dpdp-act-2023
   name: Digital Personal Data Protection Act
