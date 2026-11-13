@@ -323,6 +323,24 @@ policies:
       quote: Not for the first time, the government’s elusive claims about the efficacy of demonetisation
         have been met with tangible data suggesting that the exercise failed to achieve its various goals.
       source_item: 57cba65afb2de539049bcdc65219f6fddd52c99b26d43fa6fea786946dca57ed
+  - aspect: outcome_failure
+    name: Spike in counterfeit note detection
+    score: 65.0
+    weight: 1.0
+    description: Data showed that the detection of fake notes for various denominations spiked significantly
+      in subsequent years rather than being eradicated.
+    model: gemini:gemini-3.5-flash-lite
+    prompt_version: prompt_v4
+    evidence:
+    - url: https://thewire.in/economy/how-successful-was-demonetisation-four-takeaways-from-the-rbis-annual-report
+      title: How successful was demonetisation? Four takeaways from the RBI's annual report
+      tier: 2
+      multiplier: 1.0
+      content_hash: 863c74995a2fc6d493162a319053b898214c3aa4f68c5d35282f9ebf83aa4d5a
+      archived_location: null
+      quote: For instance, the detection of fake Rs 50 and Rs 100 notes spiked the most in at least three
+        years in the financial year ending March 2018.
+      source_item: b371f4481684e054a06cb42dcdfb4593397120a9c02b16b429bbeed5e784dd59
   - aspect: transparency_gap
     name: Derailment and delay of parliamentary report on demonetisation
     score: 45.0
@@ -935,6 +953,24 @@ policies:
       quote: Exporters, for instance, will not be able to expect any refund before mid-November on input
         taxes paid in advance and the IGST levied on goods they imported, leading to a huge blockage of
         the working capital.
+      source_item: 8e9e19e147c88029025f4a54d3f79bd213860041aa12e289336b725f77a616a1
+  - aspect: outcome_failure
+    name: Technical glitches and portal crashes
+    score: 50.0
+    weight: 1.0
+    description: Technical glitches on the GST portal caused system crashes during the first month of
+      return filing.
+    model: gemini:gemini-3.5-flash-lite
+    prompt_version: prompt_v4
+    evidence:
+    - url: https://www.tribuneindia.com/news/archive/features/miles-away-from-one-nation-one-tax-489432
+      title: Miles away from one nation, one tax
+      tier: 2
+      multiplier: 1.0
+      content_hash: 047a0c3d218e666480808afb079eb35f04da07a8570c10bd7f7b2d19406edf95
+      archived_location: null
+      quote: Over 25 odd technical glitches, led to the crash of the GST portal on at least two occasions
+        in the very first month of return filing.
       source_item: 8e9e19e147c88029025f4a54d3f79bd213860041aa12e289336b725f77a616a1
   aspect_reviews: []
 - slug: spectrum-allocation-2g-2008
