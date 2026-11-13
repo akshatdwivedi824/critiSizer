@@ -143,3 +143,43 @@ snapshot later.]
 **Extraction cleanup (text_v2).** Split sentences glued by captions, drop page furniture, keep initials intact, require the policy to be mentioned in the body. A reclean script applied this to stored rows.
 
 **Incidents.** A Gemini API key was pasted into a command twice (rotation not yet confirmed). A File Explorer move took the prompts folder out of place and failed 18 tests; restored from git and now guarded by a test.
+
+## Day 19 — Rating rule and aspect reviews
+- Overall rating now needs all six aspects resolved. An aspect is resolved when it
+  has an approved indicator, or a reviewer records "no negative evidence" (needs
+  at least 3 sources from at least 2 outlets, audited, reversible).
+- Partial policies show "Under review: N of 6 aspects resolved" instead of a number.
+  Snapshots skip unrated policies.
+- Added aspect_reviews table (migration 09d20bf1b251) and admin endpoints to
+  mark/reopen an aspect.
+- Tests updated for the new rule. 239 passing.
+
+## Day 20 — Evidence extraction and collection
+- Excerpt extraction rewritten (text_v2): splits glued captions, drops page
+  furniture, requires the body to mention the policy. Re-cleaned stored excerpts;
+  removed rows that held only JavaScript notices.
+- GDELT client now retries on transport and HTTP errors instead of crashing.
+- Live GDELT collection from the home IP is throttled (429, gave up). Evidence so
+  far comes from hand-picked URLs, not live collection. Plan: retry from the
+  deployed host, else disclose a curated URL list.
+- Prompt files restored; guard test added so they cannot go missing silently.
+- OPEN: Gemini key rotation not yet confirmed.
+- OPEN: real free-tier rate limits not yet read from AI Studio; the daily cap in
+  config is a guess.
+
+## Day 21 — Container and first deploy
+- Dockerfile (non-root, deps layer first), .dockerignore, compose with app and worker.
+- /health (liveness) and /health/ready (database and Redis; 503 on failure);
+  scripts/smoke.py checks both plus pages.
+- Deployed on Render free tier ($0): Docker web service, free Postgres 16, free
+  Key Value. Free Postgres expires after 30 days, so re-seed about every 28 days.
+- Render does not run the Docker command through a shell, so migration, seed and
+  server start live in scripts/start.sh (`sh scripts/start.sh`).
+- Added .gitattributes `*.sh text eol=lf` alongside the existing global LF rule.
+- Live checks: smoke test passes (8/8), x-cache HIT on /api/policies, admin
+  endpoint returns 403 without a token, CI green.
+- Gate 3: no secrets in git history, none in the image. NOT YET DONE: scoring
+  spread/control/hand-score gap note in docs/scoring-method.md.
+- The free web service spins down after 15 minutes idle. Measured 13 Nov 2026:
+  first request after idle took 73 s (includes container start, migration and
+  seed); warm requests take 0.6-1.3 s.
