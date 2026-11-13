@@ -25,7 +25,9 @@ from fastapi import APIRouter, Depends
 from starlette.datastructures import MutableHeaders
 from starlette.types import ASGIApp, Message, Receive, Scope, Send
 
+from critisizer import cache
 from critisizer.admin import require_admin
+from critisizer.singleflight import flights
 
 REQUEST_LOGGER = "critisizer.request"
 QUIET_ROUTES = {"/health", "/health/ready"}
@@ -196,4 +198,8 @@ router = APIRouter()
 @router.get("/metrics", dependencies=[Depends(require_admin)], include_in_schema=False)
 def metrics_endpoint() -> dict[str, Any]:
     """Admin-only request counts and latency, from this process's memory."""
-    return metrics.snapshot()
+    return {
+        **metrics.snapshot(),
+        "cache": cache.stats(),
+        "single_flight": flights.stats(),
+    }

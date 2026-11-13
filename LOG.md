@@ -202,3 +202,17 @@ snapshot later.]
   tests (disable_existing_loggers=False). Tests file name must be lowercase
   (test_*.py) or Linux CI will not collect it.
 - 13 new tests; full suite 286 passing.
+- Cache resilience: circuit breaker in src/critisizer/cache.py (opens after 3
+  consecutive Redis failures, skips Redis for 30 s, then one probe call decides
+  whether to close or reopen). Readiness checks bypass it on purpose. While open,
+  rate limiting and cache invalidation are skipped, as they already were when
+  Redis was down.
+- Single-flight (src/critisizer/singleflight.py): concurrent misses on the policy
+  list share one computation. Per process only, which is one worker on Render; a
+  slow or failed leader never blocks followers for more than 5 s.
+- /metrics now also reports breaker state, trips, skipped calls and single-flight
+  counts.
+- conftest resets the breaker and single-flight before every test, because both are
+  process-wide.
+- Failure drill (local): Redis stopped, pages kept loading with X-Cache MISS,
+  timings dropped after the breaker opened; recovered after restart.

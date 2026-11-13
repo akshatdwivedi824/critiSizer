@@ -118,3 +118,9 @@ def test_cache_hits_and_misses_are_counted():
     m.record("GET", "/x", 200, 1.0, "HIT")
     stats = m.snapshot()["routes"]["GET /x"]
     assert (stats["cache_hits"], stats["cache_misses"]) == (1, 1)
+
+
+def test_metrics_include_cache_and_single_flight_sections(client, admin_headers):
+    body = client.get("/metrics", headers=admin_headers).json()
+    assert body["cache"]["state"] == "closed"
+    assert "coalesced" in body["single_flight"]

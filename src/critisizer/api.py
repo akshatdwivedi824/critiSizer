@@ -17,6 +17,7 @@ from critisizer.scorecard import (
     build_policy_summary,
     load_active_rubric,
 )
+from critisizer.singleflight import flights
 
 router = APIRouter(prefix="/api", tags=["policies"])
 
@@ -65,14 +66,20 @@ def list_policies(session: SessionDep, response: Response) -> list[PolicySummary
         response.headers["X-Cache"] = "HIT"
         return cached
 
-    summaries = [build_policy_summary(session, p, rubric) for p in policies]
-    cache.set_json(
-        key,
-        [s.model_dump(mode="json") for s in summaries],
-        LIST_CACHE_TTL_SECONDS,
-    )
-    response.headers["X-Cache"] = "MISS"
-    return summaries
+    def compute() -> tuple[list[dict], str]:
+        # Another request may have filled the cache since our miss.
+        again = cache.get_json(key)
+        if again is not None:
+            return again, "HIT"
+        summaries = [build_policy_summary(session, p, rubric) for p in policies]
+        payload = [s.model_dump(mode="json") for s in summaries]
+        cache.set_json(key, payload, LIST_CACHE_TTL_SECONDS)
+        return payload, "MISS"
+
+    # Concurrent misses share one computation instead of all hitting the database.
+    payload, source = flights.run(key, compute)
+    response.headers["X-Cache"] = source
+    return payload
 
 
 @router.get("/policies/{slug}", response_model=PolicyDetail)

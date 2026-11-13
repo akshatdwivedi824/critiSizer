@@ -69,6 +69,19 @@ def clean_redis() -> Iterator[None]:
     flush()
 
 
+@pytest.fixture(autouse=True)
+def reset_cache_state() -> Iterator[None]:
+    """The breaker and single-flight are process-wide; never leak them across tests."""
+    from critisizer import cache
+    from critisizer.singleflight import flights
+
+    cache.breaker.reset()
+    flights.reset()
+    yield
+    cache.breaker.reset()
+    flights.reset()
+
+
 @pytest.fixture
 def session(test_engine) -> Iterator[Session]:
     connection = test_engine.connect()
