@@ -1275,6 +1275,21 @@ policies:
       OTT services such as WhatsApp, Signal, Gmail etc. Here, the unfounded hope and the underserved servility
       in statements that OTT regulat'
     content_hash: 30c42f5184699f5ef3b1338dc366e60ff05e394cdbaf96c29e72ab5af4d7ba20
+  - url: https://scroll.in/latest/1060900/scroll_in
+    outlet: Scroll
+    published_at: null
+    excerpt: 'Lok Sabha passes Telecom Bill that allows Centre to take control of services
+
+      Lok Sabha passes Telecom Bill that allows Centre to take control of services
+
+      The proposed law provides for the interception of messages and their transmission to be stopped
+      in case of public emergency.
+
+      The Lok Sabha on Wednesday passed the 2023 Telecommunications Bill that provides for the Centre
+      to temporarily take control of telecom services in the interest of national security.
+
+      The proposed law says that in case of a'
+    content_hash: 3e5db885f76787d726dd65a034878c0721b1282d0974b54e871a36691b80b0a7
   - url: https://scroll.in/article/1060973/scroll_in
     outlet: Scroll
     published_at: null
@@ -1290,5 +1305,45 @@ policies:
 
       '
     content_hash: 5cb060baec56bf34b12cb7adbb34f9a0525245bddf8f233719fa2dc56cca37f3
-  indicators: []
+  - url: https://thewire.in/tech/controversial-telecom-bill-becomes-act-in-absence-of-suspended-opposition-mps
+    outlet: The Wire
+    published_at: null
+    excerpt: 'Controversial Telecom Bill Passed by Both Houses in Absence of Suspended Opposition MPs
+
+      New Delhi: The Rajya Sabha on Thursday (December 21) approved the controversial Telecommunications
+      Bill, 2023, granting the government the authority to temporarily take control of telecom services
+      in the ‘interest of national security’.The Bill, which was passed through a voice vote, allows the
+      Union to assume possession of a telecom network in cases of public emergency or for the interest
+      of public safety. C'
+    content_hash: 6bdb083c229153ed0f362ff58dd88bf01e7af8af7cbe99a64a27a8c053c5e0bc
+  - url: https://thewire.in/government/telecom-broadcasting-data-protection-bill-digipub
+    outlet: The Wire
+    published_at: null
+    excerpt: 'Three New Laws Give the Govt Extraordinary Powers Over Journalism, Entertainment and Internet
+
+      New Delhi: Three new legislations give the Union government power to censor news content, imperil
+      encrypted communication, make it easier to shut down the internet, and intercept communications
+      with minimal accountability. These views were put forth by leading experts at a meeting organised
+      on December 20 by Digipub, which represents over 60 digital news media, independent journalists
+      and commentators. '
+    content_hash: b37fd01856960382a9ebf562bb6fdb7a86af1336d037115e057f45dd61337176
+  indicators:
+  - aspect: transparency_gap
+    name: Refusal to provide aggregate interception data
+    score: 65.0
+    weight: 1.0
+    description: The Government of India refuses to provide aggregate data on the number of interception
+      orders that it issues.
+    model: gemini:gemini-3.5-flash-lite
+    prompt_version: prompt_v4
+    evidence:
+    - url: https://thewire.in/government/cleverly-drafted-telecom-bill-government-tightens-grip-digital-india
+      title: 'Cleverly drafted telecom bill: government tightens grip on digital India'
+      tier: 2
+      multiplier: 1.0
+      content_hash: 32cfb156e180a141e5f1bb61957b871ea60c8c34a3abde13e340ee31f36ee51e
+      archived_location: null
+      quote: For instance, the Government of India even now refuses to provide aggregate data on the number
+        of interception orders that it issues.
+      source_item: 30c42f5184699f5ef3b1338dc366e60ff05e394cdbaf96c29e72ab5af4d7ba20
   aspect_reviews: []
