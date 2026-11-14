@@ -181,6 +181,25 @@ policies:
     content_hash: b371f4481684e054a06cb42dcdfb4593397120a9c02b16b429bbeed5e784dd59
   indicators:
   - aspect: equity_impact
+    name: Adverse impact on the informal sector and unorganised workers
+    score: 65.0
+    weight: 1.0
+    description: Informal sector workers faced severe difficulties including long queues, loss of earnings,
+      and increased debt due to cash shortages.
+    model: gemini:gemini-3.5-flash-lite
+    prompt_version: prompt_v4
+    evidence:
+    - url: https://thewire.in/economy/demonetisation-a-gimmick-to-distract-from-ineffectual-governance-say-civil-society-members
+      title: Demonetisation a gimmick to distract from ineffectual governance, say civil society members
+      tier: 2
+      multiplier: 1.0
+      content_hash: bc11b4c1a6d5d04f19dfda0ec592423d3484e577049eb6f4137a4d2733019632
+      archived_location: null
+      quote: Domestic workers, daily wage labourers, rickshaw and auto drivers, dhobis, street vendors
+        such as hawkers, fishermen and others in the informal cash economy now have to choose between
+        going to work and earning money or joining serpentine queues to access their own money.
+      source_item: 80e70b9a8e29d299a390fac8644bc76947a6c9484c768aaa6a70556e8ceb0513
+  - aspect: equity_impact
     name: Job losses in the informal sector
     score: 65.0
     weight: 1.0
@@ -588,6 +607,34 @@ policies:
       archived_location: null
       quote: Pardiwala, and Manoj Misra.The bench said that the amendments to the Companies Act are unconstitutional.
       source_item: cc8c3207d40dc18f2bb574d311159e3766c2fe13b66072560a5ffb9788dfc2dc
+  - aspect: legal_challenges
+    name: Court orders refund or return of unencashed electoral bonds
+    score: 80.0
+    weight: 1.0
+    description: The Supreme Court ordered that unencashed electoral bonds within the 15-day validity
+      period must be returned to the purchasers.
+    model: gemini:gemini-3.5-flash-lite
+    prompt_version: prompt_v4
+    evidence:
+    - url: https://thewire.in/law/supreme-court-electoral-bonds-quash-anonymous
+      title: Supreme Court quashes electoral bonds, anonymous donations
+      tier: 2
+      multiplier: 1.0
+      content_hash: 0d9b6be6ea7f667e92a29883cf5ae700f1b595dea3d32cfbf1a22dd924758a4c
+      archived_location: null
+      quote: According to reporter Arvind Gunasekar, the Supreme Court has also ordered political parties
+        to refund un-encashed electoral bonds to donor individuals and companies if they are within the
+        15-day validity period.
+      source_item: cc8c3207d40dc18f2bb574d311159e3766c2fe13b66072560a5ffb9788dfc2dc
+    - url: https://scroll.in/latest/1063719/supreme-court-strikes-down-electoral-bonds-scheme
+      title: Supreme Court strikes down electoral bonds scheme
+      tier: 2
+      multiplier: 1.0
+      content_hash: a97d639344ee1ba12b97d947e8b77495ae2a9b59b3da26044d6880ef3a4e75a6
+      archived_location: null
+      quote: Electoral bonds that are within the validity period of 15 days but have not been encashed
+        by political parties yet must be returned to the purchaser, the court ordered.
+      source_item: 27b8bd8f158ce00c0adc1ca8f9d7d776f4f857e22720e14eb73d4726770066f7
   - aspect: legal_challenges
     name: Supreme Court strikes down electoral bonds scheme
     score: 80.0
