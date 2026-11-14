@@ -388,6 +388,18 @@ policies:
   summary_source_url: null
   aims: []
   source_items:
+  - url: https://thewire.in/law/excessive-centralisation-of-power-lawyers-activists-journalists-mps-express-fear-on-dpdp-act
+    outlet: The Wire
+    published_at: null
+    excerpt: '''Excessive Centralisation of Power'': Lawyers, Activists, Journalists, MPs Express Fear
+      Over DPDP Act
+
+      New Delhi: A group of representatives from social movements, campaigns, civil society organisations,
+      and including senior lawyers, retired judges, journalists, media and parliamentarians met for a
+      day-long consultation on the implications of the controversial Digital Personal Data Protection
+      (DPDP) Act, 2023. The meeting was organised by the Roll Back RTI Amendments Campaign (comprising
+      the Natio'
+    content_hash: 139239bf9a53ffdd586a3de699056c0555c1ae71bcc07087d5742c143a9afcbc
   - url: https://thewire.in/government/opposition-activists-raise-alarm-as-modi-govt-gets-ready-to-pass-data-protection-bill
     outlet: The Wire
     published_at: null
@@ -422,7 +434,63 @@ policies:
       They urged the government to repeal Section 44 (3) of the DPDP Act, saying that the provision will
       destroy press freedom and infringes upon the “soul of Right to Information (RTI) Act” while '
     content_hash: 84f7cd85bf61bbb85efe27159aee4930ea9b80967858370ef7ec0cdfb64cb661
+  - url: https://thewire.in/rights/civil-society-members-meet-rahul-gandhi-lok-sabha-mps-demand-roll-back-of-amendments-to-rti-act
+    outlet: The Wire
+    published_at: null
+    excerpt: 'Civil Society Members Meet Rahul Gandhi, Lok Sabha MPs, Demand Roll back of Amendments to
+      RTI Act
+
+      New Delhi: A delegation of civil society members including activists, academics, researchers and
+      journalists on Tuesday (March 25) met Lok Sabha Leader of Opposition Rahul Gandhi and MPs from several
+      parties to put forth concerns regarding the amendments made to the RTI Act through the Digital Personal
+      Data Protection (DPDP) Act. The delegation also highlighted the chilling effect of the DPDP Act
+      on'
+    content_hash: 89c7ce3cadbb7f53406ae91e5dfd008f1c8bdc7b1b02fb7499c048faf50c74db
+  - url: https://scroll.in/latest/1073867/scroll_in
+    outlet: Scroll
+    published_at: null
+    excerpt: 'NITI Aayog had flagged that Data Protection Act could weaken RTI: Report
+
+      NITI Aayog had flagged that Data Protection Act could weaken RTI: Report
+
+      The recommendations were not accepted as the Department of Personnel and Training did express any
+      concerns, reported ‘The Indian Express’.
+
+      Union government-run think tank NITI Aayog had objected to the provisions of the Digital Personal
+      Data Protection Act that propose an amendment to the Right to Information Act, The Indian Express
+      reported on Sunday.'
+    content_hash: 9d62e36543b6542e559a32b0aaa739841c997379025864de5ac0708d47ceee1b
+  - url: https://www.deccanherald.com/india/press-freedom-at-risk-under-dpdp-act-3750864
+    outlet: Deccan Herald
+    published_at: null
+    excerpt: 'Press freedom at risk under DPDP Act
+
+      India’s Digital Personal Data Protection Act (DPDP Act), 2023, establishes a consent-centric framework
+      for processing digital personal data, with penalties for non-compliance, while granting the government
+      significant powers to define exemptions. The Act lists limited carve-outs (such as ‘certain legitimate
+      uses’, court functions, and mergers). But unlike many global privacy regimes, it does not create
+      a tailored exemption – or even a balancing test – specifi'
+    content_hash: e141d7ad21b7e42e53c1d57dbc0a51da09a0fba823c26fd860b8ddbca9d25b6b
   indicators:
+  - aspect: equity_impact
+    name: Unequal Burden on Independent Media and Officials
+    score: 45.0
+    weight: 1.0
+    description: The Act creates an asymmetry by providing expansive state carve-outs without corresponding
+      exemptions for newsgathering, placing an uneven burden on independent media.
+    model: gemini:gemini-3.5-flash-lite
+    prompt_version: prompt_v4
+    evidence:
+    - url: https://www.deccanherald.com/india/press-freedom-at-risk-under-dpdp-act-3750864
+      title: Press freedom at risk under DPDP Act
+      tier: 2
+      multiplier: 1.0
+      content_hash: 3339af4d044571b37e8f140ad76b4f35c59eb70d74d6ead9d7e3946cc0d2b353
+      archived_location: null
+      quote: 'This asymmetry—expansive State carve-outs without a corresponding press/public-interest
+        carve-out—raises concerns about uneven burdens: officials gain latitude, while independent media
+        receive none.'
+      source_item: e141d7ad21b7e42e53c1d57dbc0a51da09a0fba823c26fd860b8ddbca9d25b6b
   - aspect: ground_level_harm
     name: Restrictions on press freedom and RTI
     score: 80.0
