@@ -1278,6 +1278,20 @@ policies:
       and challenges. While the system has simplified tax processes for some, many MSMEs continue to grapple
       with compliance complexities, increased'
     content_hash: 00482bf247b72de9afb7ba282f10ee1ac723456b51fd8cf293930095d6e74f48
+  - url: https://scroll.in/article/851577/scroll_in
+    outlet: Scroll
+    published_at: null
+    excerpt: 'No tax refund, no working capital: How GST is hurting Indian exporters
+
+      Delays in processing tax refunds under the new Goods and Services Tax regime has locked up the funds
+      of exporters, hurting their businesses and affecting their ability to be competitive in international
+      markets.
+
+      On September 19, a delegation of exporters met Revenue Secretary Hasmukh Adhia, who is heading a
+      committee set up to look into the GST-related issues that India’s export sector is facing.
+
+      During the meeting, the Feder'
+    content_hash: 6bc5ec141493c02bd3528a3ecf882d4e393592105e38587f4e688e883d29b69b
   - url: https://www.tribuneindia.com/news/archive/features/miles-away-from-one-nation-one-tax-489432
     outlet: The Tribune
     published_at: null
@@ -1289,6 +1303,17 @@ policies:
       up of the composition scheme limit. However, what has really made the life of the average SME business
       owner difficult is the gamut of technical glitches that have hit '
     content_hash: 8e9e19e147c88029025f4a54d3f79bd213860041aa12e289336b725f77a616a1
+  - url: https://thewire.in/economy/streamlining-gst-eight-years-of-evolution-and-expectation
+    outlet: The Wire
+    published_at: null
+    excerpt: 'Streamlining GST: Eight Years of Evolution and Expectation
+
+      In a recent enforcement drive, the Karnataka State Commercial Taxes Department employed UPI transaction
+      data sourced through platforms such as PhonePe, Google Pay, Paytm, and BHIM, to cross-reference
+      financial inflows against Goods and Services Tax (GST) registration records. This data-led initiative
+      culminated in show-cause notices being issued to nearly 13,000 small taxpayers, mostly street vendors
+      and micro-enterprises, for alleged no'
+    content_hash: 9550dcb01718574bb954d7f987d56f176660c7e8d082f00e29b754c2b5c73653
   - url: https://scroll.in/article/851917/scroll_in
     outlet: Scroll
     published_at: null
@@ -1301,6 +1326,27 @@ policies:
       to cope with the change. This series explores the problems they are facing, with the focu'
     content_hash: c7cb340e4f9e2bfaef6c73a3ec455bee81ebba272d29c936477eff13291db331
   indicators:
+  - aspect: cost_waste
+    name: Working capital blockage from delayed refunds
+    score: 50.0
+    weight: 1.0
+    description: Delays in input tax credit refunds and tax processing have locked up exporter funds and
+      created a liquidity crunch.
+    model: gemini:gemini-3.5-flash-lite
+    prompt_version: prompt_v4
+    evidence_status: realised
+    projection_source: null
+    evidence:
+    - url: https://scroll.in/article/851577/scroll_in
+      title: 'No tax refund, no working capital: How GST is hurting Indian exporters'
+      tier: 2
+      multiplier: 1.0
+      content_hash: f64e2f2d2f5d10a5d24365a34e30e4edb99fd5521d5305c98cacd2ad0f8a17b2
+      archived_location: null
+      quote: Delays in processing tax refunds under the new Goods and Services Tax regime has locked up
+        the funds of exporters, hurting their businesses and affecting their ability to be competitive
+        in international markets.
+      source_item: 6bc5ec141493c02bd3528a3ecf882d4e393592105e38587f4e688e883d29b69b
   - aspect: equity_impact
     name: Disproportionate compliance burden and cost impact on MSMEs
     score: 40.0
@@ -1371,6 +1417,27 @@ policies:
         businesses.
       source_item: 00482bf247b72de9afb7ba282f10ee1ac723456b51fd8cf293930095d6e74f48
   - aspect: ground_level_harm
+    name: Reluctance of small vendors to accept UPI payments
+    score: 40.0
+    weight: 1.0
+    description: A growing number of small vendors are reluctant to accept UPI payments due to heightened
+      anxiety over regulatory scrutiny.
+    model: gemini:gemini-3.5-flash-lite
+    prompt_version: prompt_v4
+    evidence_status: realised
+    projection_source: null
+    evidence:
+    - url: https://thewire.in/economy/streamlining-gst-eight-years-of-evolution-and-expectation
+      title: 'Streamlining GST: Eight Years of Evolution and Expectation'
+      tier: 2
+      multiplier: 1.0
+      content_hash: c69476e39b3a52779f1341ee7318fbd315212876d61252ada8aac154293048d9
+      archived_location: null
+      quote: In the wake of this crackdown, a growing number of small vendors, many of whom haven’t even
+        received notices, are now reluctant to accept UPI payments altogether, spurred by heightened anxiety
+        over regulatory scrutiny.
+      source_item: 9550dcb01718574bb954d7f987d56f176660c7e8d082f00e29b754c2b5c73653
+  - aspect: ground_level_harm
     name: Supply chain disruptions and business growth slowdown
     score: 35.0
     weight: 1.0
@@ -1440,6 +1507,26 @@ policies:
         taxes paid in advance and the IGST levied on goods they imported, leading to a huge blockage of
         the working capital.
       source_item: 8e9e19e147c88029025f4a54d3f79bd213860041aa12e289336b725f77a616a1
+  - aspect: legal_challenges
+    name: Mounting litigation load and compliance disputes
+    score: 35.0
+    weight: 1.0
+    description: The mounting litigation load underscores the pressing need for a fully operational Appellate
+      Tribunal system as compliance-related disputes become more frequent and complex.
+    model: gemini:gemini-3.5-flash-lite
+    prompt_version: prompt_v4
+    evidence_status: realised
+    projection_source: null
+    evidence:
+    - url: https://thewire.in/economy/streamlining-gst-eight-years-of-evolution-and-expectation
+      title: 'Streamlining GST: Eight Years of Evolution and Expectation'
+      tier: 2
+      multiplier: 1.0
+      content_hash: 884156fac8989f0a2b37bc4c6e98a9a3f24fe1cc8c0567e0de5e8640d0d01d03
+      archived_location: null
+      quote: The mounting litigation load underscores the pressing need for a fully operational Appellate
+        Tribunal system, particularly as compliance-related disputes become more frequent and complex.
+      source_item: 9550dcb01718574bb954d7f987d56f176660c7e8d082f00e29b754c2b5c73653
   - aspect: outcome_failure
     name: Technical glitches and portal crashes
     score: 50.0
