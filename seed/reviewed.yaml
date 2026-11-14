@@ -431,6 +431,48 @@ policies:
       inherent dangers to the Right to Information (RTI) Act.“The purpose of the Bill is to provide for
       the proces'
     content_hash: 4390e8dd274e5524b4ef1e6aa4f384c68bfd241a5ba7ecead36b0fc4689abf34
+  - url: https://www.tribuneindia.com/news/india/digital-personal-data-protection-act-and-dpdp-rules-challenged-in-supreme-court/
+    outlet: The Tribune
+    published_at: null
+    excerpt: 'Digital Personal Data Protection Act and DPDP Rules challenged in Supreme Court - The Tribune
+
+      Digital Personal Data Protection Act and DPDP Rules challenged in Supreme Court
+
+      The new regime effectively barred disclosure of personal information altogether, regardless of whether
+      larger public interest justifies such disclosure, the petitioner said
+
+      Alleging that the Digital Personal Data Protection Act, 2023 and the DPDP Rules, 2025, substantially
+      weakened the transparency framework under the Right '
+    content_hash: 4e14b9245fed12a6a9cb3337de072e8898ff571e23cbf5ff37e3b5182ead2469
+  - url: https://www.tribuneindia.com/news/india/sc-issues-notice-to-centre-on-petitions-challenging-digital-personal-data-protection-act-2023/
+    outlet: The Tribune
+    published_at: null
+    excerpt: 'SC issues notice to Centre on petitions challenging Digital Personal Data Protection Act,
+      2023 - The Tribune
+
+      SC issues notice to Centre on petitions challenging Digital Personal Data Protection Act, 2023
+
+      The petitioners contended that the new data regime severely diluted the RTI Act and granted the
+      Centre ‘sweeping powers’ over personal data
+
+      The Supreme Court on Monday issued notice to the Centre on petitions challenging the constitutional
+      validity of several provisions of the Digital Personal D'
+    content_hash: 5647d8089fa668b9e11c265592504a8e7918b7730a75e9c236d436050d6ac08e
+  - url: https://www.tribuneindia.com/news/india/sc-notice-to-centre-on-plea-challenging-2023-data-protection-law/
+    outlet: The Tribune
+    published_at: null
+    excerpt: 'SC notice to Centre on plea challenging 2023 data protection law - The Tribune
+
+      SC notice to Centre on plea challenging 2023 data protection law
+
+      Petitioners contended that the new data regime severely diluted the RTI Act
+
+      The Supreme Court has issued notice to the Centre on a petition challenging the validity of several
+      provisions of the Digital Personal Data Protection Act (DPDP), 2023.
+
+      A three-judge Bench led by CJI Surya Kant on Thursday agreed to hear the petition filed by Geeta
+      Seshu and aske'
+    content_hash: 7304888a94968b20e05d8e245ace86c0458a4ecf4fe7cdf36aa2492e0344a112
   - url: https://deccanherald.com/india/karnataka/bengaluru/new-data-protection-law-draws-criticism-2648820
     outlet: Deccan Herald
     published_at: null
@@ -480,6 +522,21 @@ policies:
       Data Protection Act that propose an amendment to the Right to Information Act, The Indian Express
       reported on Sunday.'
     content_hash: 9d62e36543b6542e559a32b0aaa739841c997379025864de5ac0708d47ceee1b
+  - url: https://www.tribuneindia.com/news/india/sc-asks-centre-to-respond-to-petition-challenging-provisions-of-2023-data-protection-law/
+    outlet: The Tribune
+    published_at: null
+    excerpt: 'SC asks Centre to respond to petition challenging provisions of 2023 data protection law
+      - The Tribune
+
+      SC asks Centre to respond to petition challenging provisions of 2023 data protection law
+
+      Centre notified the Digital Personal Data Protection Rules, 2025, on November 14, 2025
+
+      The Supreme Court on Thursday issued notice to the Centre on a petition challenging the validity
+      of several provisions of the Digital Personal Data Protection Act, 2023.
+
+      A three-judge Bench led by Chief Justice of India S'
+    content_hash: a30d1815f373af96aef812aaa99c3a083ba09fece8825c8242eb883cedc48ac3
   - url: https://www.deccanherald.com/india/press-freedom-at-risk-under-dpdp-act-3750864
     outlet: Deccan Herald
     published_at: null
@@ -561,6 +618,29 @@ policies:
       quote: “Section 44(3) seeks to substitute a critical safeguard in the RTI Act, allowing the government
         to withhold personal information without evaluating public interest,” Gogoi said.
       source_item: 84f7cd85bf61bbb85efe27159aee4930ea9b80967858370ef7ec0cdfb64cb661
+  - aspect: legal_challenges
+    name: Supreme Court challenge to DPDP Act and Rules
+    score: 65.0
+    weight: 1.0
+    description: The Supreme Court issued notice to the Centre on petitions challenging the constitutional
+      validity of several provisions of the Digital Personal Data Protection Act, 2023 and the DPDP Rules,
+      2025.
+    model: gemini:gemini-3.5-flash-lite
+    prompt_version: prompt_v4
+    evidence_status: realised
+    projection_source: null
+    evidence:
+    - url: https://www.tribuneindia.com/news/india/sc-issues-notice-to-centre-on-petitions-challenging-digital-personal-data-protection-act-2023/
+      title: SC issues notice to Centre on petitions challenging Digital Personal Data Protection Act,
+        2023 - The Tribune
+      tier: 2
+      multiplier: 1.0
+      content_hash: 7a51c6f1e1c964b6b74357e0acda94526e0e4cf0b7721066cdb78b686c531895
+      archived_location: null
+      quote: The Supreme Court on Monday issued notice to the Centre on petitions challenging the constitutional
+        validity of several provisions of the Digital Personal Data Protection (DPDP) Act, 2023 and the
+        DPDP Rules, 2025.
+      source_item: 5647d8089fa668b9e11c265592504a8e7918b7730a75e9c236d436050d6ac08e
   - aspect: transparency_gap
     name: Exemption of personal information from disclosure under RTI
     score: 60.0
@@ -639,6 +719,43 @@ policies:
       Bharatiya Janata Party over the past five years, purchasing about Rs 670 crore ($81 million) of
       electoral bonds, data from the commission showed. Qwik Supply Chain P'
     content_hash: 4bfb5a4c6ec6c3f363f40aec8dc7a19cf1507c0f9ab3228e68e117a122c96467
+  - url: https://thewire.in/law/electoral-bonds-top-supreme-court-quotes
+    outlet: The Wire
+    published_at: null
+    excerpt: 'Electoral Bonds Scheme Violative of Voter’s Right to Information: Top Quotes From the Supreme
+      Court
+
+      New Delhi: The Supreme Court on Thursday (February 15) delivered its judgment on petitions contesting
+      the electoral bonds scheme, ruling it as violative of Article 19(1)(a) and unconstitutional. The
+      bench, consisting of Chief Justice of India D.Y. Chandrachud, along with Justices Sanjiv Khanna,
+      BR Gavai, JB Pardiwala, and Manoj Misra, delivered two separate but unanimous verdicts on the petitions '
+    content_hash: 5e75c2139ac6807d522d071f8edf48d321d14123d7788b036548c2dcbd4b1011
+  - url: https://www.tribuneindia.com/news/india/unconstitutional-sc-junks-electoral-bonds-scheme-seeks-info-on-donors-591168
+    outlet: The Tribune
+    published_at: null
+    excerpt: '‘Unconstitutional’: Supreme Court junks electoral bonds scheme, seeks info on donors - The
+      Tribune
+
+      Ahead of the 2024 Lok Sabha elections, the Supreme Court on Thursday declared “unconstitutional”
+      the electoral bonds scheme that allowed individuals and companies to make unlimited anonymous donations
+      to political parties.
+
+      Noting that voters have right to know, a five-judge Constitution Bench led by CJI DY Chandrachud
+      said the scheme violated Article 19(1)(a) of the Constitution, which guaranteed r'
+    content_hash: 63adc46541ecbd957ee9a6e79e117b19555536ca03160b7e37bd01808bd410d5
+  - url: https://scroll.in/article/1063790/explained-why-the-supreme-court-struck-down-the-electoral-bonds-scheme
+    outlet: Scroll
+    published_at: null
+    excerpt: 'Explained: Why the Supreme Court struck down the electoral bonds scheme
+
+      The electoral bonds scheme introduced by the Bharatiya Janata Party in 2017-’18 is unconstitutional
+      because it disproportionately restricts the fundamental right of voters to information about the
+      source of funds accepted by a political party – knowledge of which is essential if voters are to
+      exercise their freedom to vote effectively. This is the crux of the Supreme Court’s judgment striking
+      down the scheme on Thursday.
+
+      The'
+    content_hash: 80cdc81ac37650dcb338ac10f4c4afe5ffdbfff11f354ba67b887bd080652482
   - url: https://thewire.in/law/supreme-court-electoral-bonds-quash-anonymous
     outlet: The Wire
     published_at: null
@@ -667,6 +784,26 @@ policies:
       - Honeywell Properties, another firm with a Reliance link, bou'
     content_hash: f8d7fbf4e8e642839d1d61ac759c6c69bcab061cb2e2e615e2eb7b346f1e2cc5
   indicators:
+  - aspect: equity_impact
+    name: Asymmetrical access to donor identities between ruling and opposition parties
+    score: 75.0
+    weight: 1.0
+    description: The Supreme Court bench noted that under the scheme, the ruling party would have the
+      identity of donors while no opposition party could have it.
+    model: gemini:gemini-3.5-flash-lite
+    prompt_version: prompt_v4
+    evidence_status: realised
+    projection_source: null
+    evidence:
+    - url: https://thewire.in/law/supreme-court-electoral-bonds-quash-anonymous
+      title: Supreme Court quashes electoral bonds, anonymous donations
+      tier: 2
+      multiplier: 1.0
+      content_hash: 785fa84a3faf397da76a7fcbf4a09155afc926641ad2825a722bdabd3c7f7e07
+      archived_location: null
+      quote: The bench noted that under the scheme, while the ruling party would have the identity of
+        the donors, no opposition party could have it.
+      source_item: cc8c3207d40dc18f2bb574d311159e3766c2fe13b66072560a5ffb9788dfc2dc
   - aspect: equity_impact
     name: Disproportionate funding advantage for ruling party
     score: 65.0
@@ -790,6 +927,28 @@ policies:
       archived_location: null
       quote: Supreme Court strikes down electoral bonds scheme
       source_item: 27b8bd8f158ce00c0adc1ca8f9d7d776f4f857e22720e14eb73d4726770066f7
+  - aspect: transparency_gap
+    name: Anonymity of electoral bonds scheme violates right to information
+    score: 75.0
+    weight: 1.0
+    description: The Supreme Court ruled that the electoral bonds scheme anonymised political contributions
+      and violated the constitutional right to information.
+    model: gemini:gemini-3.5-flash-lite
+    prompt_version: prompt_v4
+    evidence_status: realised
+    projection_source: null
+    evidence:
+    - url: https://www.tribuneindia.com/news/india/unconstitutional-sc-junks-electoral-bonds-scheme-seeks-info-on-donors-591168
+      title: '‘Unconstitutional’: Supreme Court junks electoral bonds scheme, seeks info on donors - The
+        Tribune'
+      tier: 2
+      multiplier: 1.0
+      content_hash: 91e8a37186f3dd5ad6a7df6fb0febfbb5a60b4e31584981a19011c456d0dd655
+      archived_location: null
+      quote: The electoral bonds Scheme and the impugned provisions to the extent that they infringe upon
+        the right to information of the voter by anonymising contributions through electoral bonds are
+        violative of Article 19(1)(a) (right to freedom of speech and expression),” the Bench said.
+      source_item: 63adc46541ecbd957ee9a6e79e117b19555536ca03160b7e37bd01808bd410d5
   - aspect: transparency_gap
     name: Anonymous nature of electoral bonds
     score: 85.0
