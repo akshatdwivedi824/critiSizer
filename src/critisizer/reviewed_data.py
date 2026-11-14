@@ -13,9 +13,13 @@ raw evidence runs and snapshots.
 Import only creates or updates; it never deletes. Something rejected locally
 must also be rejected on a live database, or it disappears at the next re-seed
 into a fresh database.
+
+Format 2 (method v2) adds an indicator's evidence_status and projection_source
+and an aspect review's review_date. Format 1 files still import: the missing
+fields default to "realised", no projection source and no review date.
 """
 
-from datetime import UTC, datetime
+from datetime import UTC, date, datetime
 from decimal import Decimal
 from typing import Any
 
@@ -33,7 +37,8 @@ from critisizer.models import (
     SourceItem,
 )
 
-FORMAT_VERSION = 1
+FORMAT_VERSION = 2
+SUPPORTED_FORMATS = frozenset({1, 2})
 IMPORT_API = "seed"
 COUNTED = ("source_items", "indicators", "evidence", "aims", "reviews")
 MAX_EXCERPT_CHARS = 500
@@ -53,6 +58,16 @@ def _when(value: Any) -> datetime | None:
     if isinstance(value, datetime):
         return value
     return datetime.fromisoformat(value)
+
+
+def _day(value: Any) -> date | None:
+    if not value:
+        return None
+    if isinstance(value, datetime):
+        return value.date()
+    if isinstance(value, date):
+        return value
+    return date.fromisoformat(str(value))
 
 
 def _dec(value: Any) -> Decimal:
@@ -109,6 +124,8 @@ def _export_policy(
                 "description": row.description,
                 "model": row.model,
                 "prompt_version": row.prompt_version,
+                "evidence_status": row.evidence_status,
+                "projection_source": row.projection_source,
                 "evidence": [
                     {
                         "url": ev.source_url,
@@ -161,6 +178,7 @@ def _export_policy(
                 "aspect": aspect_code[r.aspect_id],
                 "outcome": r.outcome,
                 "reason": r.reason,
+                "review_date": r.review_date.isoformat() if r.review_date else None,
             }
             for r in reviews
         ],
@@ -176,7 +194,7 @@ def import_reviewed(session: Session, data: dict[str, Any]) -> dict[str, int]:
     Does not commit; the caller does. Raises ValueError if the data names a
     policy or aspect the database does not have, so a mismatch fails loudly.
     """
-    if data.get("format") != FORMAT_VERSION:
+    if data.get("format") not in SUPPORTED_FORMATS:
         raise ValueError(f"unsupported reviewed-data format: {data.get('format')}")
     aspects = {row.code: row for row in session.scalars(select(Aspect))}
     created = dict.fromkeys(COUNTED, 0)
@@ -296,6 +314,9 @@ def _import_indicators(
         row.status = "approved"
         row.model = entry.get("model")
         row.prompt_version = entry.get("prompt_version")
+        # Format 1 files lack these two: realised, with no projection source.
+        row.evidence_status = entry.get("evidence_status") or "realised"
+        row.projection_source = entry.get("projection_source")
         session.flush()
         _import_evidence(session, row, items, entry.get("evidence", []), created)
 
@@ -388,3 +409,4 @@ def _import_reviews(
             created["reviews"] += 1
         row.outcome = entry["outcome"]
         row.reason = entry["reason"]
+        row.review_date = _day(entry.get("review_date"))
