@@ -80,10 +80,24 @@ class OverallResult:
     spike_flag: bool
 
 
-def _check_inputs(aspect_scores: Mapping[str, Decimal | None], rubric: Rubric) -> None:
+def _check_inputs(
+    aspect_scores: Mapping[str, Decimal | None],
+    rubric: Rubric,
+    partial: bool = False,
+) -> None:
+    """With partial=False every rubric aspect must be scored (method v1).
+
+    With partial=True the scores may cover any non-empty subset of the rubric's
+    aspects (method v2: only assessed aspects are in the number).
+    """
     if not rubric.weights:
         raise ScoringError("rubric has no aspects")
-    if set(aspect_scores) != set(rubric.weights):
+    if partial:
+        if not aspect_scores:
+            raise ScoringError("no assessed aspects")
+        if not set(aspect_scores) <= set(rubric.weights):
+            raise ScoringError("aspect scores name an aspect the rubric does not have")
+    elif set(aspect_scores) != set(rubric.weights):
         raise ScoringError("aspect scores must match the rubric's aspects exactly")
     for code, score in aspect_scores.items():
         if score is None:
@@ -99,13 +113,25 @@ def _check_inputs(aspect_scores: Mapping[str, Decimal | None], rubric: Rubric) -
         raise ScoringError("min_ratings must be at least 1")
 
 
-def expert_average(aspect_scores: Mapping[str, Decimal], rubric: Rubric) -> Decimal:
-    _check_inputs(aspect_scores, rubric)
-    total_weight = sum(rubric.weights.values(), Decimal(0))
+def _weighted(
+    aspect_scores: Mapping[str, Decimal], rubric: Rubric
+) -> tuple[Decimal, Decimal]:
+    """(sum of weight*score, sum of weights) over the aspects present."""
     weighted = sum(
         (rubric.weights[code] * score for code, score in aspect_scores.items()),
         Decimal(0),
     )
+    total_weight = sum(
+        (rubric.weights[code] for code in aspect_scores), Decimal(0)
+    )
+    return weighted, total_weight
+
+
+def expert_average(
+    aspect_scores: Mapping[str, Decimal], rubric: Rubric, partial: bool = False
+) -> Decimal:
+    _check_inputs(aspect_scores, rubric, partial)
+    weighted, total_weight = _weighted(aspect_scores, rubric)
     return weighted / total_weight
 
 
@@ -133,21 +159,18 @@ def overall_rating(
     aspect_scores: Mapping[str, Decimal],
     ratings: Sequence[RatingInput],
     rubric: Rubric,
+    partial: bool = False,
 ) -> OverallResult:
-    _check_inputs(aspect_scores, rubric)
+    _check_inputs(aspect_scores, rubric, partial)
     people, count = people_rating(ratings, rubric.min_ratings)
-    weighted = sum(
-        (rubric.weights[code] * score for code, score in aspect_scores.items()),
-        Decimal(0),
-    )
-    total_weight = sum(rubric.weights.values(), Decimal(0))
+    weighted, total_weight = _weighted(aspect_scores, rubric)
     if people is not None:
         weighted += rubric.people_weight * people
         total_weight += rubric.people_weight
     return OverallResult(
         rubric_label=rubric.label,
         aspect_scores=dict(aspect_scores),
-        expert_average=expert_average(aspect_scores, rubric),
+        expert_average=expert_average(aspect_scores, rubric, partial),
         people_rating=people,
         people_rating_count=count,
         overall_rating=weighted / total_weight,

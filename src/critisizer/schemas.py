@@ -23,6 +23,8 @@ class IndicatorOut(BaseModel):
     evidence: list[EvidenceOut]
     model: str | None = None
     prompt_version: str | None = None
+    evidence_status: str = "realised"
+    projection_source: str | None = None
 
 
 class AspectScoreOut(BaseModel):
@@ -32,8 +34,10 @@ class AspectScoreOut(BaseModel):
     # "no_negative_evidence" means a reviewer found none in the collected sources.
     score: float | None
     indicators: list[IndicatorOut]
+    # unresolved | scored | no_negative_evidence | projected | too_early
     status: str = "unresolved"
     review_reason: str | None = None
+    review_date: date | None = None
 
 
 class PolicySummary(BaseModel):
@@ -44,9 +48,13 @@ class PolicySummary(BaseModel):
     # True once at least one aspect is resolved.
     scored: bool = True
     # True only when all aspects are resolved; the overall rating exists only then.
+    # True when enough aspects rest on realised evidence (method v2: at least 4).
     rated: bool = False
     aspects_resolved: int = 0
+    # Aspects on realised evidence; these make up the rating.
+    aspects_assessed: int = 0
     aspects_total: int = 0
+    method_version: str = "v2"
     overall_rating: float | None
     spike_flag: bool
     people_rating: float | None

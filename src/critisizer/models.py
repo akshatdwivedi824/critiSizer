@@ -4,6 +4,7 @@ from typing import Any
 
 from sqlalchemy import (
     CheckConstraint,
+    Date,
     DateTime,
     ForeignKey,
     Index,
@@ -105,6 +106,10 @@ class Indicator(Base):
             "status IN ('ai_draft', 'approved', 'rejected')",
             name="ck_indicators_status_allowed",
         ),
+        CheckConstraint(
+            "evidence_status IN ('realised', 'alleged', 'projected')",
+            name="ck_indicators_evidence_status_allowed",
+        ),
     )
 
     id: Mapped[int] = mapped_column(primary_key=True)
@@ -119,12 +124,18 @@ class Indicator(Base):
     status: Mapped[str] = mapped_column(String(20), server_default="approved")
     model: Mapped[str | None] = mapped_column(String(100))
     prompt_version: Mapped[str | None] = mapped_column(String(50))
+    evidence_status: Mapped[str] = mapped_column(
+        String(20), server_default="realised"
+    )
+    # For a projected indicator: who made the forecast (a named source).
+    projection_source: Mapped[str | None] = mapped_column(Text)
 
 
 class AspectReview(Base):
-    """A reviewer's recorded finding that an aspect has no negative evidence in
-    the collected sources. Without this row or an approved indicator, the
-    aspect is unresolved and the policy gets no overall rating."""
+    """A reviewer's recorded finding on an aspect with no approved indicator:
+    either that the collected sources hold no negative evidence for it, or that
+    it is too early to assess (with a date to look again). Without this row or
+    an approved indicator, the aspect is unresolved."""
 
     __tablename__ = "aspect_reviews"
     __table_args__ = (
@@ -132,8 +143,12 @@ class AspectReview(Base):
             "policy_id", "aspect_id", name="uq_aspect_reviews_policy_aspect"
         ),
         CheckConstraint(
-            "outcome IN ('no_negative_evidence')",
+            "outcome IN ('no_negative_evidence', 'too_early')",
             name="ck_aspect_reviews_outcome_allowed",
+        ),
+        CheckConstraint(
+            "outcome <> 'too_early' OR review_date IS NOT NULL",
+            name="ck_aspect_reviews_too_early_needs_date",
         ),
     )
 
@@ -144,6 +159,8 @@ class AspectReview(Base):
     aspect_id: Mapped[int] = mapped_column(ForeignKey("aspects.id"))
     outcome: Mapped[str] = mapped_column(String(30))
     reason: Mapped[str] = mapped_column(Text)
+    # When a "too early" finding is due to be looked at again.
+    review_date: Mapped[date | None] = mapped_column(Date)
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now()
     )

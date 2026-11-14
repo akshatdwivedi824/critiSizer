@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from decimal import Decimal
 
 from sqlalchemy import func, select
@@ -38,6 +38,13 @@ from critisizer.scoring.engine import (
 MIN_SOURCES = 3
 MIN_OUTLETS = 2
 
+# Method v2 (ADR 0004): an overall rating needs at least this many aspects that
+# are assessed on realised evidence (approved realised indicators, or a
+# reviewer's "no negative evidence"). Projected and "too early" aspects are
+# shown but are not in the number.
+MIN_ASSESSED = 4
+METHOD_VERSION = "v2"
+
 
 def load_active_rubric(session: Session) -> Rubric:
     version = session.scalar(
@@ -66,49 +73,90 @@ def scored_policy_ids(session: Session) -> set[int]:
 
 @dataclass(frozen=True)
 class Progress:
-    """Which aspects of a policy a human has resolved.
+    """The state of each aspect of a policy, as a human has left it.
 
-    An aspect is resolved by an approved indicator (scored) or by a reviewer
-    recording that the collected sources hold no negative evidence for it.
+    scored:    an approved realised (or alleged) indicator exists
+    reviewed:  a reviewer recorded "no negative evidence" in the sources
+    projected: only approved projected indicators exist
+    too_early: a reviewer recorded that it is too early to assess
+    Anything else is unresolved.
     """
 
     scored: frozenset[str]
     reviewed: frozenset[str]
     total: int
+    projected: frozenset[str] = field(default_factory=frozenset)
+    too_early: frozenset[str] = field(default_factory=frozenset)
 
     @property
-    def resolved(self) -> int:
+    def assessed(self) -> int:
+        """Aspects on realised evidence: these make up the rating."""
         return len(self.scored | self.reviewed)
 
     @property
+    def resolved(self) -> int:
+        """Aspects in any stated state (anything but unresolved)."""
+        return len(self.scored | self.reviewed | self.projected | self.too_early)
+
+    @property
     def rated(self) -> bool:
-        return self.total > 0 and self.resolved == self.total
+        return self.total > 0 and self.assessed >= min(MIN_ASSESSED, self.total)
 
     def status(self, code: str) -> str:
         if code in self.scored:
             return "scored"
         if code in self.reviewed:
             return "no_negative_evidence"
+        if code in self.projected:
+            return "projected"
+        if code in self.too_early:
+            return "too_early"
         return "unresolved"
 
 
 def policy_progress(session: Session, policy_id: int) -> Progress:
-    scored = set(
-        session.scalars(
-            select(Aspect.code)
-            .join(Indicator, Indicator.aspect_id == Aspect.id)
-            .where(Indicator.policy_id == policy_id, Indicator.status == "approved")
+    def indicator_codes(*, projected: bool) -> set[str]:
+        condition = (
+            Indicator.evidence_status == "projected"
+            if projected
+            else Indicator.evidence_status != "projected"
         )
-    )
-    reviewed = set(
-        session.scalars(
-            select(Aspect.code)
-            .join(AspectReview, AspectReview.aspect_id == Aspect.id)
-            .where(AspectReview.policy_id == policy_id)
+        return set(
+            session.scalars(
+                select(Aspect.code)
+                .join(Indicator, Indicator.aspect_id == Aspect.id)
+                .where(
+                    Indicator.policy_id == policy_id,
+                    Indicator.status == "approved",
+                    condition,
+                )
+            )
         )
-    )
+
+    def review_codes(outcome: str) -> set[str]:
+        return set(
+            session.scalars(
+                select(Aspect.code)
+                .join(AspectReview, AspectReview.aspect_id == Aspect.id)
+                .where(
+                    AspectReview.policy_id == policy_id,
+                    AspectReview.outcome == outcome,
+                )
+            )
+        )
+
+    scored = indicator_codes(projected=False)
+    projected = indicator_codes(projected=True) - scored
+    reviewed = review_codes("no_negative_evidence") - scored
+    too_early = review_codes("too_early") - scored - projected
     total = session.scalar(select(func.count(Aspect.id))) or 0
-    return Progress(frozenset(scored), frozenset(reviewed), total)
+    return Progress(
+        frozenset(scored),
+        frozenset(reviewed),
+        total,
+        frozenset(projected),
+        frozenset(too_early),
+    )
 
 
 def evidence_depth(session: Session, policy_id: int) -> tuple[int, int]:
@@ -128,10 +176,17 @@ def indicator_multiplier(evidence: list[Evidence]) -> Decimal:
 
 
 def score_policy(session: Session, policy_id: int, rubric: Rubric) -> OverallResult:
+    """The overall result over assessed aspects only (method v2).
+
+    Projected and too-early aspects are not in the number.
+    """
+    progress = policy_progress(session, policy_id)
     aspects = session.execute(select(Aspect.id, Aspect.code)).all()
     indicators = session.scalars(
         select(Indicator).where(
-            Indicator.policy_id == policy_id, Indicator.status == "approved"
+            Indicator.policy_id == policy_id,
+            Indicator.status == "approved",
+            Indicator.evidence_status != "projected",
         )
     ).all()
     evidence = session.scalars(
@@ -142,30 +197,29 @@ def score_policy(session: Session, policy_id: int, rubric: Rubric) -> OverallRes
     for ev in evidence:
         ev_by_ind.setdefault(ev.indicator_id, []).append(ev)
 
-    aspect_scores = {}
+    aspect_scores: dict[str, Decimal | None] = {}
     for aspect_id, code in aspects:
-        inputs = [
-            IndicatorInput(
-                score=Decimal(str(i.score)),
-                weight=Decimal(str(i.weight)),
-                multiplier=indicator_multiplier(ev_by_ind.get(i.id, [])),
-            )
-            for i in indicators
-            if i.aspect_id == aspect_id
-        ]
-        if not inputs:
-            # No approved indicator: either a reviewer recorded "no negative
-            # evidence found" (a reviewed 0) or the policy is not rated yet.
-            aspect_scores[code] = Decimal(0)
-        else:
-            # Indicators exist: keep the strict rule (error if no valid evidence).
+        if code in progress.scored:
+            inputs = [
+                IndicatorInput(
+                    score=Decimal(str(i.score)),
+                    weight=Decimal(str(i.weight)),
+                    multiplier=indicator_multiplier(ev_by_ind.get(i.id, [])),
+                )
+                for i in indicators
+                if i.aspect_id == aspect_id
+            ]
+            # Strict rule kept: no valid evidence on an indicator is an error.
             aspect_scores[code] = aspect_score(inputs)
+        elif code in progress.reviewed:
+            # A reviewer found no negative evidence: a reviewed 0.
+            aspect_scores[code] = Decimal(0)
 
     rating_rows = session.execute(
         select(Rating.value, Rating.status).where(Rating.policy_id == policy_id)
     ).all()
     ratings = [RatingInput(value=Decimal(str(v)), status=s) for v, s in rating_rows]
-    return overall_rating(aspect_scores, ratings, rubric)
+    return overall_rating(aspect_scores, ratings, rubric, partial=True)
 
 
 def _r(value: Decimal) -> float:
@@ -174,7 +228,7 @@ def _r(value: Decimal) -> float:
 
 def _fields(policy: Policy, progress: Progress, result: OverallResult | None) -> dict:
     """Summary fields. The overall rating, spike flag and people rating exist
-    only for a fully resolved policy (result is not None)."""
+    only for a rated policy (result is not None)."""
     return {
         "slug": policy.slug,
         "name": policy.name,
@@ -183,7 +237,9 @@ def _fields(policy: Policy, progress: Progress, result: OverallResult | None) ->
         "scored": progress.resolved > 0,
         "rated": result is not None,
         "aspects_resolved": progress.resolved,
+        "aspects_assessed": progress.assessed,
         "aspects_total": progress.total,
+        "method_version": METHOD_VERSION,
         "overall_rating": None if result is None else _r(result.overall_rating),
         "spike_flag": False if result is None else result.spike_flag,
         "people_rating": (
@@ -252,13 +308,13 @@ def build_policy_detail(
         .where(Evidence.indicator_id.in_([i.id for i in indicators]))
         .order_by(Evidence.id)
     ).all()
-    reasons = dict(
-        session.execute(
-            select(Aspect.code, AspectReview.reason)
-            .join(AspectReview, AspectReview.aspect_id == Aspect.id)
-            .where(AspectReview.policy_id == policy.id)
-        ).all()
-    )
+    review_rows = session.execute(
+        select(Aspect.code, AspectReview.reason, AspectReview.review_date)
+        .join(AspectReview, AspectReview.aspect_id == Aspect.id)
+        .where(AspectReview.policy_id == policy.id)
+    ).all()
+    reasons = {code: reason for code, reason, _ in review_rows}
+    review_dates = {code: when for code, _, when in review_rows}
 
     ev_pairs: dict[int, list[tuple[Evidence, str | None]]] = {}
     for ev, outlet in evidence_rows:
@@ -277,6 +333,8 @@ def build_policy_detail(
                 weight=float(ind.weight),
                 model=ind.model,
                 prompt_version=ind.prompt_version,
+                evidence_status=ind.evidence_status,
+                projection_source=ind.projection_source,
                 evidence=[
                     EvidenceOut(
                         source_url=ev.source_url,
@@ -292,10 +350,13 @@ def build_policy_detail(
             )
             for ind in own
         ]
-        if result is not None:
+        # The shown score rests on realised indicators; a projected-only aspect
+        # shows its projected score, flagged by its status.
+        basis = [i for i in own if i.evidence_status != "projected"] or own
+        if result is not None and aspect.code in result.aspect_scores:
             score: float | None = _r(result.aspect_scores[aspect.code])
         elif own:
-            partial = _partial_score(own, ev_by_ind)
+            partial = _partial_score(basis, ev_by_ind)
             score = None if partial is None else _r(partial)
         elif status == "no_negative_evidence":
             score = 0.0
@@ -309,6 +370,7 @@ def build_policy_detail(
                 indicators=items,
                 status=status,
                 review_reason=reasons.get(aspect.code),
+                review_date=review_dates.get(aspect.code),
             )
         )
 
