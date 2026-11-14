@@ -1641,5 +1641,13 @@ policies:
       quote: For instance, the Government of India even now refuses to provide aggregate data on the number
         of interception orders that it issues.
       source_item: 30c42f5184699f5ef3b1338dc366e60ff05e394cdbaf96c29e72ab5af4d7ba20
-  aspect_reviews: []
+  aspect_reviews:
+  - aspect: cost_waste
+    outcome: too_early
+    reason: Act passed Dec 2023; most provisions await Rules
+    review_date: '2027-06-01'
+  - aspect: outcome_failure
+    outcome: too_early
+    reason: Act passed Dec 2023; most provisions await Rules
+    review_date: '2027-06-01'
   withdrawn: []
