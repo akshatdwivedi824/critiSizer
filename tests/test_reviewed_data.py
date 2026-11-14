@@ -162,6 +162,7 @@ def test_round_trip_restores_everything(session):
         "evidence": 1,
         "aims": 1,
         "reviews": 1,
+        "withdrawn": 0,
     }
     assert export_reviewed(session, [SLUG]) == before
 

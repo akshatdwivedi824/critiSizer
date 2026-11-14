@@ -10,9 +10,11 @@ aspect reviews, and the collected source excerpts.
 Never exported: AI drafts, rejected rows, users, ratings, jobs, the audit log,
 raw evidence runs and snapshots.
 
-Import only creates or updates; it never deletes. Something rejected locally
-must also be rejected on a live database, or it disappears at the next re-seed
-into a fresh database.
+Import creates or updates and never deletes. Something approved earlier and
+then withdrawn locally (scripts/withdraw_indicator.py) is carried in each
+policy's optional `withdrawn` list, built from the audit log; import rejects the
+matching approved indicator on the live database. A withdrawn key that is
+approved again locally is not listed.
 
 Format 2 (method v2) adds an indicator's evidence_status and projection_source
 and an aspect review's review_date. Format 1 files still import: the missing
@@ -26,9 +28,11 @@ from typing import Any
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
+from critisizer.audit import record_audit
 from critisizer.models import (
     Aspect,
     AspectReview,
+    AuditLog,
     Evidence,
     EvidenceRun,
     Indicator,
@@ -40,7 +44,8 @@ from critisizer.models import (
 FORMAT_VERSION = 2
 SUPPORTED_FORMATS = frozenset({1, 2})
 IMPORT_API = "seed"
-COUNTED = ("source_items", "indicators", "evidence", "aims", "reviews")
+WITHDRAW_ACTION = "indicator.withdraw"
+COUNTED = ("source_items", "indicators", "evidence", "aims", "reviews", "withdrawn")
 MAX_EXCERPT_CHARS = 500
 
 
@@ -151,6 +156,7 @@ def _export_policy(
         select(AspectReview).where(AspectReview.policy_id == policy.id)
     ).all()
     reviews.sort(key=lambda row: aspect_code[row.aspect_id])
+    approved_keys = {(aspect_code[row.aspect_id], row.name) for row in indicator_rows}
 
     return {
         "slug": policy.slug,
@@ -182,7 +188,33 @@ def _export_policy(
             }
             for r in reviews
         ],
+        "withdrawn": _export_withdrawn(session, policy, approved_keys),
     }
+
+
+def _export_withdrawn(
+    session: Session, policy: Policy, approved_keys: set[tuple[str, str]]
+) -> list[dict[str, Any]]:
+    """Withdrawals recorded in the audit log, minus any key approved right now
+    (a rejected draft sharing a name with an approved indicator is not one)."""
+    rows = session.scalars(
+        select(AuditLog)
+        .where(AuditLog.action == WITHDRAW_ACTION)
+        .order_by(AuditLog.id)
+    ).all()
+    found: dict[tuple[str, str], str] = {}
+    for row in rows:
+        details = row.details or {}
+        if details.get("policy") != policy.slug:
+            continue
+        key = (details.get("aspect"), details.get("name"))
+        if None in key or key in approved_keys:
+            continue
+        found[key] = details.get("reason") or ""
+    return [
+        {"aspect": aspect, "name": name, "reason": reason}
+        for (aspect, name), reason in sorted(found.items())
+    ]
 
 
 # ---------------------------------------------------------------- import
@@ -211,6 +243,9 @@ def import_reviewed(session: Session, data: dict[str, Any]) -> dict[str, int]:
         )
         _import_indicators(
             session, policy, aspects, items, entry.get("indicators", []), created
+        )
+        _import_withdrawn(
+            session, policy, aspects, entry.get("withdrawn", []), created
         )
         _import_aims(session, policy, entry.get("aims", []), created)
         _import_reviews(
@@ -319,6 +354,42 @@ def _import_indicators(
         row.projection_source = entry.get("projection_source")
         session.flush()
         _import_evidence(session, row, items, entry.get("evidence", []), created)
+
+
+def _import_withdrawn(
+    session: Session,
+    policy: Policy,
+    aspects: dict[str, Aspect],
+    entries: list[dict[str, Any]],
+    created: dict[str, int],
+) -> None:
+    for entry in entries:
+        aspect = _aspect(aspects, entry["aspect"])
+        rows = session.scalars(
+            select(Indicator).where(
+                Indicator.policy_id == policy.id,
+                Indicator.aspect_id == aspect.id,
+                Indicator.name == entry["name"],
+                Indicator.status == "approved",
+            )
+        ).all()
+        for row in rows:
+            row.status = "rejected"
+            record_audit(
+                session,
+                WITHDRAW_ACTION,
+                "indicator",
+                row.id,
+                {
+                    "policy": policy.slug,
+                    "aspect": entry["aspect"],
+                    "name": entry["name"],
+                    "reason": entry.get("reason") or "",
+                    "via": "import",
+                },
+            )
+            created["withdrawn"] += 1
+    session.flush()
 
 
 def _import_evidence(
