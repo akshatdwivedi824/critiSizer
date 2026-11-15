@@ -605,7 +605,12 @@ policies:
       archived_location: null
       quote: “The new law exempts ‘personal information’ from being disclosed.
       source_item: 7de59158c3f8f63dc8e99264ec5f8626eaac5c1ad4b080df393800e1c7c13ffd
-  aspect_reviews: []
+  aspect_reviews:
+  - aspect: ground_level_harm
+    outcome: too_early
+    reason: RTI amendment in force Nov 2025; no documented post-amendment refusals found in curated sources
+      at review
+    review_date: '2027-06-01'
   withdrawn:
   - aspect: ground_level_harm
     name: Restrictions on press freedom and RTI
@@ -683,6 +688,18 @@ policies:
       Noting that voters have right to know, a five-judge Constitution Bench led by CJI DY Chandrachud
       said the scheme violated Article 19(1)(a) of the Constitution, which guaranteed r'
     content_hash: 63adc46541ecbd957ee9a6e79e117b19555536ca03160b7e37bd01808bd410d5
+  - url: https://thewire.in/politics/after-electoral-bonds-income-from-unknown-sources-to-political-parties-rose-to-72-of-total-income
+    outlet: The Wire
+    published_at: null
+    excerpt: 'After Electoral Bonds: Income from Unknown Sources to Political Parties Rose to 72% of Total
+      Income
+
+      New Delhi: A Constitution bench of the Supreme Court is hearing the case on electoral bonds, against
+      which multiple petitions have been filed. The arguments are ongoing. Arguing for the Union government,
+      solicitor general Tushar Mehta spoke on the need for electoral bonds, in order to make sure that
+      unknown sources of income to political parties are minimised. His case on day two of the hearing
+      in'
+    content_hash: 6db739e0a546e7b06aa588b9381afda43607159f32858c9f1f8ac7b83b2d0e96
   - url: https://scroll.in/article/1063790/explained-why-the-supreme-court-struck-down-the-electoral-bonds-scheme
     outlet: Scroll
     published_at: null
@@ -867,6 +884,27 @@ policies:
       archived_location: null
       quote: Supreme Court strikes down electoral bonds scheme
       source_item: 27b8bd8f158ce00c0adc1ca8f9d7d776f4f857e22720e14eb73d4726770066f7
+  - aspect: outcome_failure
+    name: Increase in proportion of party income from unknown sources
+    score: 45.0
+    weight: 1.0
+    description: Data analysis showed that the share of income from unknown sources to national parties
+      rose from 66% prior to the policy to 72% after its introduction.
+    model: gemini:gemini-3.5-flash-lite
+    prompt_version: prompt_v4
+    evidence_status: realised
+    projection_source: null
+    evidence:
+    - url: https://thewire.in/politics/after-electoral-bonds-income-from-unknown-sources-to-political-parties-rose-to-72-of-total-income
+      title: 'After Electoral Bonds: Income from Unknown Sources to Political Parties Rose to 72% of Total
+        Income'
+      tier: 2
+      multiplier: 1.0
+      content_hash: ab92c2e10c96619baece191eb328b5a958fa3b0a285964443b6f288b100d14fe
+      archived_location: null
+      quote: The source of funds from unknown sources to national parties in FY2015-FY2017, rose from
+        66% to 72% (nearly three-fourths) in FY2019-FY2022 period.
+      source_item: 6db739e0a546e7b06aa588b9381afda43607159f32858c9f1f8ac7b83b2d0e96
   - aspect: transparency_gap
     name: Anonymity of electoral bonds scheme violates right to information
     score: 75.0
@@ -1033,6 +1071,18 @@ policies:
       Repealing the three farm laws would have been unfair to the “silent majority” of farmers who had
       supported the agriculture reforms introduced by the Narendra Modi government in Septe'
     content_hash: 97471008bd078cd1361f5d9b0524d339bb07bd5237d7d000990ca1f9293079cd
+  - url: https://scroll.in/article/1013236/in-punjab-not-everyone-is-celebrating-the-repeal-of-farm-laws-some-are-grieving-for-their-losses
+    outlet: Scroll
+    published_at: null
+    excerpt: 'In Punjab, not everyone is celebrating the repeal of farm laws. Some are grieving for their
+      losses
+
+      One of the videos shows an old man walking calmly towards a divider at a toll plaza in the night.
+      There is no one around. The old man loosens his turban and ties it to an iron bar in the plaza.
+      Another video, from a different angle, shows the old man struggling to make a noose of his turban.
+      Then there are images which show the old man’s lifeless body hanging above the concrete divider.
+      There’s ano'
+    content_hash: af4698f38ffb39fb1dc9715f1120c618e828b43c9e901e849a650d046bef924e
   - url: https://thewire.in/law/supreme-court-farm-laws-implemntation-stay-committee-talks
     outlet: The Wire
     published_at: null
@@ -1169,7 +1219,12 @@ policies:
       archived_location: null
       quote: I would like to announce to everyone that we have decided to repeal these laws.
       source_item: 8dd23efd7b565595c2804daaaab5b9ec812e93326be75f9c6f053763f24425e0
-  aspect_reviews: []
+  aspect_reviews:
+  - aspect: cost_waste
+    outcome: no_negative_evidence
+    reason: Laws stayed Jan 2021 and repealed Nov 2021; never operated, so no implementation costs to
+      document
+    review_date: null
   withdrawn:
   - aspect: transparency_gap
     name: Delayed public release of committee report
@@ -1505,6 +1560,17 @@ policies:
       2009-05-04 , 2G Spectrum Scam: CAG reports on loss placed before SC Draft reports of the CAG, which
       pointed out that the scam on 2G spectrum allocation caused a loss of Rs 1.'
     content_hash: 7ec024ce713330f9236ed18c7c913c7c1f86a849c621f392cf747b81d0b6053d
+  - url: https://www.deccanherald.com/india/sc-axes-2g-licences-orders-2309408
+    outlet: Deccan Herald
+    published_at: null
+    excerpt: 'SC axes 2G licences, orders auction
+
+      In a judgment that will have huge implications for the telecom sector, the Supreme Court on Thursday
+      ordered the cancellation of 122 licences of 2G spectrum granted to 11 companies in 2008, noting
+      a “flaw” in the government’s first-come-first-served policy for use of natural resources. . In its
+      order scrapping the first-come-first-served policy, the Supreme Court went beyond former telecom
+      minister A Raja, whose actions were allegedly designed to favour a few '
+    content_hash: b5c2be688ba88079a93d428c75ac13411549c3034ba75128639e17466c50d805
   indicators:
   - aspect: cost_waste
     name: CAG notional loss calculation
