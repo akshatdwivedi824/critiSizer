@@ -57,6 +57,20 @@ policies:
 
       A bench of Chief Justice Satish Chandra Sharma and Justi'
     content_hash: 11aa64012609a32b3c6ef2cfcb7eb5e53364a97d4a0cb7f38486c686198238a4
+  - url: https://www.tribuneindia.com/news/india/panel-treat-martyred-agniveers-on-par-with-soldiers-for-pension-588787
+    outlet: The Tribune
+    published_at: null
+    excerpt: 'Panel: treat martyred Agniveers on par with soldiers for pension
+
+      The Parliamentary Standing Committee on Defence today recommended that families of Agniveers who
+      die in the line duty should be provided the same benefits given to the families of regular soldiers.
+
+      The present rules do not have the provision of pension for the family of the Agniveer dying in the
+      line of duty. In case a regular soldier gets martyred, his family — wife or parents — gets pension
+      for life.
+
+      The proposal was submitted by'
+    content_hash: 120e0d6a3807f149d2e1a0f7d6f8296d24270eb9fe83b9800f595849081a19ff
   - url: https://timesofindia.indiatimes.com/city/kolkata/20-posts-in-police-other-depts-reserved-for-agniveers-cm/articleshow/133446422.cms
     outlet: The Times of India
     published_at: '2026-08-23T20:45:00+00:00'
@@ -97,6 +111,20 @@ policies:
       claiming that it was yet to receive any compensation from the Union Government, today did a part
       course correction and admitted t'
     content_hash: 819851819111facc2024a699cd985b224dc20ac8f6994a12d714cf66abe35b4a
+  - url: https://www.tribuneindia.com/news/india/agniveers-death-brings-disparity-to-fore-555996/amp
+    outlet: The Tribune
+    published_at: null
+    excerpt: 'Agniveer''s death brings disparity to fore
+
+      Agniveer''s death brings ''disparity'' to fore
+
+      Army’s Agniveer Gawate Akshay Laxman’s death during duty at the Siachen Glacier has re-opened a
+      debate on the disparity in compensation to the family of an Agniveer and a regular soldier.
+
+      Laxman was the first Agniveer to die on operational duty. Veterans say the pension to the family
+      should be the same as is given to families of full-time soldiers. A stark gap exists in payment
+      of compensation. The Army has sai'
+    content_hash: 97199a2cd03591743cf16ec615231da611e0355dc5a541bd95b15bb8b59bd7a6
   - url: https://timesofindia.indiatimes.com/toi-plus/defence-security/serving-the-indian-army-is-far-better-than-low-paying-gulf-jobs-why-gorkha-veterans-are-angry-with-nepal-govt/articleshow/133372720.cms
     outlet: The Times of India
     published_at: '2026-08-20T10:30:00+00:00'
@@ -136,7 +164,65 @@ policies:
       been a contentious point in military and political circles, with the Congress promising in its 2024
       Lok Sabha election manifesto that it would scrap the scheme and revert to the old '
     content_hash: d16f021b24d9bf22d152e0f4cf130a9f2887d44ae06f819d5a0674899fcb39c1
+  - url: https://thewire.in/government/fact-check-rahul-gandhi-rajnath-singh-insurance-payment-agniveer
+    outlet: The Wire
+    published_at: null
+    excerpt: 'Fact check: Rahul Gandhi, Rajnath Singh and the insurance payment for an Agniveer
+
+      New Delhi: Is the National Democratic Alliance government trying to claim that the insurance payment
+      made to Ajay Kumar – an Agniveer killed in a land mine explosion on January 18 in Jammu and Kashmir
+      – was part of the ‘one crore’ given to his family by the authorities? As part of his attack on the
+      government’s Agniveer scheme – which introduced two classes of soldiers with different sets of entitlements
+      in the eve'
+    content_hash: f4c6783d6540ba72135bb6f301ba07030a97590f098c6799d31208cf8e15438b
   indicators:
+  - aspect: equity_impact
+    name: Lack of pension provision for families of Agniveers dying in line of duty
+    score: 65.0
+    weight: 1.0
+    description: The current rules for the Agnipath scheme do not provide a pension for the family of
+      an Agniveer who dies in the line of duty, unlike the families of regular soldiers.
+    model: gemini:gemini-3.5-flash-lite
+    prompt_version: prompt_v4
+    evidence_status: realised
+    projection_source: null
+    evidence:
+    - url: https://www.tribuneindia.com/news/india/panel-treat-martyred-agniveers-on-par-with-soldiers-for-pension-588787
+      title: 'Panel: treat martyred Agniveers on par with soldiers for pension'
+      tier: 2
+      multiplier: 1.0
+      content_hash: d22a645804ba34f3991ec0eb341cb1a8b247d57d1cf27b4a96dd4df703cfa365
+      archived_location: null
+      quote: The present rules do not have the provision of pension for the family of the Agniveer dying
+        in the line of duty.
+      source_item: 120e0d6a3807f149d2e1a0f7d6f8296d24270eb9fe83b9800f595849081a19ff
+  - aspect: ground_level_harm
+    name: Exclusion of disabled Agniveers from disability pension and medical care
+    score: 65.0
+    weight: 1.0
+    description: An Agniveer who is disabled during operations does not receive any disability pension
+      or medical care.
+    model: gemini:gemini-3.5-flash-lite
+    prompt_version: prompt_v4
+    evidence_status: realised
+    projection_source: null
+    evidence:
+    - url: https://www.tribuneindia.com/news/india/agniveers-death-brings-disparity-to-fore-555996/amp
+      title: Agniveer's death brings disparity to fore
+      tier: 2
+      multiplier: 1.0
+      content_hash: af66a6a4d05b17f9dc67467089cc78a4d7d4d00c04b4d96ad1b36a173398c01d
+      archived_location: null
+      quote: Nor is he entitled to any medical care.
+      source_item: 97199a2cd03591743cf16ec615231da611e0355dc5a541bd95b15bb8b59bd7a6
+    - url: https://www.tribuneindia.com/news/india/agniveers-death-brings-disparity-to-fore-555996/amp
+      title: Agniveer's death brings disparity to fore
+      tier: 2
+      multiplier: 1.0
+      content_hash: f6f18cd50bcdbefe9a29019a0f77aff6c327fcea2b5d6e29c876c8220e43fd15
+      archived_location: null
+      quote: An Agniveer does not get any disability pension.
+      source_item: 97199a2cd03591743cf16ec615231da611e0355dc5a541bd95b15bb8b59bd7a6
   - aspect: ground_level_harm
     name: Protests across states by aspirants
     score: 45.0
