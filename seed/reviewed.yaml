@@ -1690,6 +1690,19 @@ policies:
       2009-05-04 , 2G Spectrum Scam: CAG reports on loss placed before SC Draft reports of the CAG, which
       pointed out that the scam on 2G spectrum allocation caused a loss of Rs 1.'
     content_hash: 7ec024ce713330f9236ed18c7c913c7c1f86a849c621f392cf747b81d0b6053d
+  - url: https://scroll.in/latest/1066978/centre-asks-sc-to-modify-2g-verdict-to-allow-spectrum-assignment-through-non-auction-means
+    outlet: Scroll
+    published_at: null
+    excerpt: 'Centre asks SC to modify 2G verdict to allow spectrum assignment through non-auction means
+
+      Centre asks SC to modify 2G verdict to allow spectrum assignment through non-auction means
+
+      In its 2012 judgement, the court had ruled that the first-come-first-served basis has subjectivity
+      in selection and could be misused.
+
+      The Centre on Monday moved an application before the Supreme Court seeking modification of its 12-year-old
+      judgement in the 2G spectrum scam case, which mandated that public resources '
+    content_hash: a53fe504b020975fca45fdc3d4f51c3027783e10b1df9c633bcd2e8364dd3ba5
   - url: https://www.deccanherald.com/india/sc-axes-2g-licences-orders-2309408
     outlet: Deccan Herald
     published_at: null
@@ -1742,7 +1755,32 @@ policies:
       quote: 2011-11-11 , SC cancels 122 licenses issued by Raja 122 licenses issued by A Raja are cancelled
         by Supreme Court.
       source_item: 7ec024ce713330f9236ed18c7c913c7c1f86a849c621f392cf747b81d0b6053d
-  aspect_reviews: []
+  - aspect: transparency_gap
+    name: Subjectivity in selection via first-come-first-served basis
+    score: 45.0
+    weight: 1.0
+    description: The court ruled that the first-come-first-served basis contained subjectivity in selection
+      and could be misused.
+    model: gemini:gemini-3.5-flash-lite
+    prompt_version: prompt_v4
+    evidence_status: realised
+    projection_source: null
+    evidence:
+    - url: https://scroll.in/latest/1066978/centre-asks-sc-to-modify-2g-verdict-to-allow-spectrum-assignment-through-non-auction-means
+      title: Centre asks SC to modify 2G verdict to allow spectrum assignment through non-auction means
+      tier: 2
+      multiplier: 1.0
+      content_hash: 4d5edc875cabc0f0780dc13e054147683da0cbeb17d59b03fae8d4a8a297a678
+      archived_location: null
+      quote: In its 2012 judgement, the court had ruled that the first-come-first-served basis has subjectivity
+        in selection and could be misused.
+      source_item: a53fe504b020975fca45fdc3d4f51c3027783e10b1df9c633bcd2e8364dd3ba5
+  aspect_reviews:
+  - aspect: equity_impact
+    outcome: no_negative_evidence
+    reason: Five collected sources from two outlets were read; none documents an unequal burden of the
+      2G allocation.
+    review_date: null
   withdrawn: []
 - slug: telecommunications-act-2023
   name: Telecommunications Act
