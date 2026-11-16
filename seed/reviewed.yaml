@@ -606,11 +606,21 @@ policies:
       quote: “The new law exempts ‘personal information’ from being disclosed.
       source_item: 7de59158c3f8f63dc8e99264ec5f8626eaac5c1ad4b080df393800e1c7c13ffd
   aspect_reviews:
+  - aspect: cost_waste
+    outcome: too_early
+    reason: The Rules were notified on 14 November 2025 and obligations phase in over 18 months, so outcomes
+      and compliance costs are not yet observable.
+    review_date: '2027-05-31'
   - aspect: ground_level_harm
     outcome: too_early
     reason: RTI amendment in force Nov 2025; no documented post-amendment refusals found in curated sources
       at review
     review_date: '2027-06-01'
+  - aspect: outcome_failure
+    outcome: too_early
+    reason: The Rules were notified on 14 November 2025 and obligations phase in over 18 months, so outcomes
+      and compliance costs are not yet observable.
+    review_date: '2027-05-31'
   withdrawn:
   - aspect: ground_level_harm
     name: Restrictions on press freedom and RTI
