@@ -1,0 +1,44 @@
+# Key facts shown beside "The policy: In a nutshell". Written by hand; check each
+# line against a source before changing it. "Decided by" names the government and
+# ruling party or coalition at the time.
+policies:
+  demonetisation-2016:
+    Announced: 8 November 2016
+    Decided by: Union Government led by the BJP (NDA), with the RBI Central Board
+    Covered: 500 and 1,000 rupee notes
+    Status: Done. Challenge dismissed by the Supreme Court in 2023.
+  gst-rollout-2017:
+    Rolled out: 1 July 2017
+    Decided by: Union Government led by the BJP (NDA), with the GST Council of the Centre and the states
+    Covered: Most central and state indirect taxes, replaced by one tax at several rate slabs
+    Status: In force
+  farm-laws-2020:
+    Passed: September 2020
+    Decided by: Union Government led by the BJP (NDA)
+    Covered: Sale of farm produce outside regulated markets, contract farming, and stock limits on essential commodities
+    Status: Repealed in 2021
+  electoral-bonds-scheme-2018:
+    Introduced: 2018
+    Decided by: Union Government led by the BJP (NDA)
+    Covered: Bearer bonds bought from an authorised bank and given to political parties
+    Status: Struck down by the Supreme Court on 15 February 2024
+  dpdp-act-2023:
+    Passed: 2023
+    Decided by: Union Government led by the BJP (NDA)
+    Covered: Processing of digital personal data
+    Status: Rules notified on 14 November 2025, with obligations phased in. Challenged in the Supreme Court.
+  telecommunications-act-2023:
+    Passed: December 2023
+    Decided by: Union Government led by the BJP (NDA)
+    Covered: Licensing and spectrum assignment for telecom services; replaces the Indian Telegraph Act, 1885
+    Status: Being brought into force in parts
+  agnipath-scheme-2022:
+    Announced: June 2022
+    Decided by: Union Government led by the BJP (NDA)
+    Covered: Four-year recruitment of soldiers into the armed forces
+    Status: In force
+  spectrum-allocation-2g-2008:
+    Allocated: 2008
+    Decided by: Union Government led by the Congress (UPA)
+    Covered: 122 telecom licences granted to 11 companies
+    Status: Licences cancelled by the Supreme Court in 2012. All accused acquitted by a special court in 2017.

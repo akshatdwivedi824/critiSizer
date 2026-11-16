@@ -1,3 +1,7 @@
+from functools import lru_cache
+from pathlib import Path
+
+import yaml
 from fastapi import APIRouter, HTTPException
 from fastapi.responses import HTMLResponse
 from sqlalchemy import select
@@ -14,6 +18,30 @@ from critisizer.scorecard import (
 from critisizer.scoring.engine import Rubric
 
 router = APIRouter()
+
+FACTS_FILE = Path("seed/policy_facts.yaml")
+
+
+@lru_cache(maxsize=1)
+def _all_facts() -> dict[str, list[tuple[str, str]]]:
+    """Key facts per policy, written by hand in seed/policy_facts.yaml. A missing
+    or unreadable file means the page falls back to the year alone."""
+    for base in (Path.cwd(), Path(__file__).resolve().parents[2]):
+        path = base / FACTS_FILE
+        if not path.is_file():
+            continue
+        try:
+            data = yaml.safe_load(path.read_text(encoding="utf-8")) or {}
+        except (OSError, yaml.YAMLError):
+            return {}
+        out: dict[str, list[tuple[str, str]]] = {}
+        for slug, rows in (data.get("policies") or {}).items():
+            if isinstance(rows, dict):
+                out[str(slug)] = [
+                    (str(k), str(v)) for k, v in rows.items() if v is not None
+                ]
+        return out
+    return {}
 
 
 def _rubric(session: Session) -> Rubric:
@@ -34,6 +62,7 @@ def _extras(session: Session, policy: Policy) -> PageExtras:
         .order_by(PolicyAim.position, PolicyAim.id)
     ).all()
     return PageExtras(
+        facts=_all_facts().get(policy.slug, []),
         aims=[(a.text, a.source_url) for a in aims],
         summary_source_url=policy.summary_source_url,
     )
