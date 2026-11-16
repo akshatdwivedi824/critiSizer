@@ -97,34 +97,21 @@ def hexagon_svg(aspects: list[AspectScoreOut], *, mini: bool = False) -> str:
         ring = _pts([_pos(i, level) for i in range(6)])
         out.append(f"<polygon points='{ring}' class='{css}'/>")
 
-    full = all(v is not None for v in values)
-    if full:
-        out.append(
-            f"<polygon points='{_pts([_pos(i, v) for i, v in enumerate(values)])}' "
-            "class='proj-shape'/>"
-        )
-    solid = [(i, v) for i, v in enumerate(counted) if v is not None]
-    if len(solid) >= 3:
-        shape = _pts([_pos(i, v) for i, v in solid])
-        out.append(f"<polygon points='{shape}' class='shape{' hollow' if full else ''}'/>")
+    # One shaded shape through all six corners: counted values, projected
+    # values, and the 50 mark for aspects with no value. The dashed edge marks
+    # the part that is not in the rating; solid segments sit on top of it.
+    if sum(v is not None for v in counted) >= 3 or any(
+        v is not None for v in values
+    ) and sum(v is not None for v in values) >= 3:
+        ring = _pts([_pos(i, v if v is not None else 50) for i, v in enumerate(values)])
+        out.append(f"<polygon points='{ring}' class='proj-shape'/>")
     for i, v in enumerate(counted):
         nxt = counted[(i + 1) % 6]
-        j = (i + 1) % 6
         if v is not None and nxt is not None:
-            (x1, y1), (x2, y2) = _pos(i, v), _pos(j, nxt)
+            (x1, y1), (x2, y2) = _pos(i, v), _pos((i + 1) % 6, nxt)
             out.append(
                 f"<line x1='{x1:.1f}' y1='{y1:.1f}' x2='{x2:.1f}' y2='{y2:.1f}' "
                 "class='seg'/>"
-            )
-        elif not full and not mini:
-            # Close the outline with a dotted line to the open marker (drawn
-            # at 50) or the projected value, so the hexagon is always complete.
-            a = values[i] if values[i] is not None else 50
-            b = values[j] if values[j] is not None else 50
-            (x1, y1), (x2, y2) = _pos(i, a), _pos(j, b)
-            out.append(
-                f"<line x1='{x1:.1f}' y1='{y1:.1f}' x2='{x2:.1f}' y2='{y2:.1f}' "
-                "class='seg-open'/>"
             )
 
     for i, (code, short) in enumerate(ORDER):

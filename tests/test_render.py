@@ -106,10 +106,12 @@ def test_each_state_gets_its_own_marker():
     assert svg.count("class='pt-open'") == 3
 
 
-def test_the_dotted_outline_appears_only_when_all_six_have_a_value():
-    five = [aspect(code) for code in CODES[:5]]
-    assert "proj-shape" not in hexagon_svg(five)
-    assert "proj-shape" in hexagon_svg(five + [aspect(CODES[5], "projected", 40.0, [])])
+def test_the_shaded_shape_needs_three_values_and_is_closed_by_placeholders():
+    assert "proj-shape" not in hexagon_svg([aspect(code) for code in CODES[:2]])
+    four = [aspect(code) for code in CODES[:4]]
+    svg = hexagon_svg(four)
+    assert svg.count("class='proj-shape'") == 1
+    assert svg.count("class='seg'") == 3
 
 
 def test_a_projected_value_is_not_part_of_the_solid_outline():

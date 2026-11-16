@@ -638,6 +638,17 @@ policies:
       Here’s a quick first analysis of the Electoral Bonds data disclosure that the SBI put up last night,
       after weeks'
     content_hash: 0e9d5efb7e9e9de691a47ab1bcd545927f2b3dcf19732197baac2d535db21c06
+  - url: https://thewire.in/government/union-govt-spent-rs-14-cr-of-taxpayers-money-on-running-the-electoral-bond-scheme-rti
+    outlet: The Wire
+    published_at: null
+    excerpt: 'Union govt spent Rs 14 cr of taxpayers'' money on the electoral bond scheme
+
+      New Delhi: The Union government has incurred a bill of nearly Rs 14 crore, to be paid with taxpayers’
+      money, on printing and managing electoral bonds according to data revealed in response to a Right
+      to Information (RTI) query filed by transparency activist, retired Commodore Lokesh Batra. Of the
+      total, Rs 12,04,59,043 has been charged as ‘commission for the sale of electoral bonds’ over 30
+      phases while Rs 1,93,73,604 acc'
+    content_hash: 2046e7f09747ea24d396c0293051d241890a0a0597d8caa84871078c14d38f4e
   - url: https://scroll.in/latest/1063719/supreme-court-strikes-down-electoral-bonds-scheme
     outlet: Scroll
     published_at: null
@@ -653,6 +664,17 @@ policies:
 
       Electoral bonds that are within the validity period of 15 days but have '
     content_hash: 27b8bd8f158ce00c0adc1ca8f9d7d776f4f857e22720e14eb73d4726770066f7
+  - url: https://www.deccanherald.com/business/govt-printed-265-lakh-electoral-bonds-of-rs-1000-and-rs-10000-each-but-sold-only-118-since-2018-923646.html
+    outlet: Deccan Herald
+    published_at: null
+    excerpt: 'Govt printed 265 lakh electoral bonds but sold only 118
+
+      The Centre printed 2.65 lakh electoral bonds each with a value of Rs 1,000 and Rs 10,000 but only
+      118 such bonds were sold since 2018, raising questions about the scheme''s poor planning and implementation.
+      . The printing of the electoral bonds in various values cost the government around Rs 1.86 crore,
+      with an analysis of RTI responses showing that the printing of one piece of bond cost Rs 28 on average.
+      . The analysis of RTIs by transparen'
+    content_hash: 4af4f0d128e7bf8ffa76002e1b3a16dc2dd8009b0c2743d02a611cebf06f4970
   - url: https://www.deccanherald.com/india/electoral-bonds-data-sbi-ec-bjp-top-donors-qwik-supply-chain-reliance-megha-engineering-infrastructure-keventer-aditya-birla-bharti-airtel-lok-sabha-2947875
     outlet: Deccan Herald
     published_at: null
@@ -713,6 +735,20 @@ policies:
 
       The'
     content_hash: 80cdc81ac37650dcb338ac10f4c4afe5ffdbfff11f354ba67b887bd080652482
+  - url: https://scroll.in/latest/990195/scroll_in
+    outlet: Scroll
+    published_at: null
+    excerpt: 'Centre has paid Rs 4.1 crore to SBI as commission for sale, shows RTI response
+
+      Electoral bonds: Centre has paid Rs 4.1 crore to SBI as commission for sale, shows RTI response
+
+      A total of 6,64,250 electoral bonds have been printed till date, amassing donations worth Rs 6,535
+      crore.
+
+      The Centre has paid Rs 4.1 crore to the State Bank of India as commission for the sale of electoral
+      bonds, The Indian Express reported on Monday, citing a Right to Information response. The government
+      has spent an addit'
+    content_hash: 84fb16c79b4c7cb33046c3c24d5e0f6e5b1ad8cc20099bf13620a6b420542af3
   - url: https://thewire.in/law/supreme-court-electoral-bonds-quash-anonymous
     outlet: The Wire
     published_at: null
@@ -741,6 +777,46 @@ policies:
       - Honeywell Properties, another firm with a Reliance link, bou'
     content_hash: f8d7fbf4e8e642839d1d61ac759c6c69bcab061cb2e2e615e2eb7b346f1e2cc5
   indicators:
+  - aspect: cost_waste
+    name: Taxpayer-funded printing and management costs
+    score: 45.0
+    weight: 1.0
+    description: The Union government incurred a bill of nearly Rs 14 crore from taxpayers' money on printing
+      and managing electoral bonds.
+    model: gemini:gemini-3.5-flash-lite
+    prompt_version: prompt_v4
+    evidence_status: realised
+    projection_source: null
+    evidence:
+    - url: https://thewire.in/government/union-govt-spent-rs-14-cr-of-taxpayers-money-on-running-the-electoral-bond-scheme-rti
+      title: Union govt spent Rs 14 cr of taxpayers' money on the electoral bond scheme
+      tier: 2
+      multiplier: 1.0
+      content_hash: 302c7eb0b4dbe9d4074008e9a82eb7cb0bcca6ce57b20d55cf7a27125fb3cb6d
+      archived_location: null
+      quote: 'New Delhi: The Union government has incurred a bill of nearly Rs 14 crore, to be paid with
+        taxpayers’ money, on printing and managing electoral bonds according to data revealed in response
+        to a Right to Information (RTI) query filed by transparency activist, retired Commodore Lokesh
+        Batra.'
+      source_item: 2046e7f09747ea24d396c0293051d241890a0a0597d8caa84871078c14d38f4e
+  - aspect: cost_waste
+    name: Wastage of money on low-denomination bonds
+    score: 45.0
+    weight: 1.0
+    description: Low sales of printed lower-denomination bonds resulted in a huge wastage of money.
+    model: gemini:gemini-3.5-flash-lite
+    prompt_version: prompt_v4
+    evidence_status: realised
+    projection_source: null
+    evidence:
+    - url: https://www.deccanherald.com/business/govt-printed-265-lakh-electoral-bonds-of-rs-1000-and-rs-10000-each-but-sold-only-118-since-2018-923646.html
+      title: Govt printed 265 lakh electoral bonds but sold only 118
+      tier: 2
+      multiplier: 1.0
+      content_hash: 04a1cbe08ef43cf27619a17d456512229340ba42d758a5f9f4708b025c6b3e73
+      archived_location: null
+      quote: '"There is a huge wastage of money in printing electoral bonds of Rs 1,000 and Rs 10,000.'
+      source_item: 4af4f0d128e7bf8ffa76002e1b3a16dc2dd8009b0c2743d02a611cebf06f4970
   - aspect: equity_impact
     name: Asymmetrical access to donor identities between ruling and opposition parties
     score: 75.0
