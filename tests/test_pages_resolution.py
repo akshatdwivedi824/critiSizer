@@ -33,9 +33,10 @@ def test_partial_policy_page_renders_as_under_review(client, session, aspects):
     add_sources(session, policy, 4, 2)
     response = client.get("/policies/partial")
     assert response.status_code == 200
-    assert "Under review: 3 of 6 aspects resolved" in response.text
-    assert "no overall rating" in response.text
-    assert "Not yet reviewed" in response.text
+    assert "Not yet rated" in response.text
+    assert "needs 4 aspects" in response.text
+    assert "3 so far" in response.text
+    assert "Not yet rated" in response.text
     assert "Based on 4 collected sources from 2 outlets" in response.text
     assert "</span> overall" not in response.text  # the rated card's wording
     assert "Expert average" not in response.text
@@ -45,7 +46,8 @@ def test_home_shows_under_review_instead_of_a_number(client, session, aspects):
     fill_policy(session, aspects, "partial", THREE)
     session.commit()
     html = client.get("/").text
-    assert "Under review: 3 of 6 aspects resolved" in html
+    assert "Not yet rated" in html
+    assert "3 of 4 aspects" in html
     assert "SPIKE" not in html
 
 
