@@ -246,8 +246,9 @@ policies:
     name: Petition challenging introduction without parliamentary law
     score: 35.0
     weight: 1.0
-    description: A petition argued that the scheme could not have been introduced without passing a law
-      in Parliament.
+    description: A petition argued that the scheme could not have been introduced without a law passed
+      by Parliament. The Delhi High Court and the Supreme Court dismissed the challenges and upheld the
+      scheme.
     model: gemini:gemini-3.5-flash-lite
     prompt_version: prompt_v4
     evidence_status: realised
