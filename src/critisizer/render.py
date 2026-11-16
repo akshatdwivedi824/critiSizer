@@ -109,11 +109,22 @@ def hexagon_svg(aspects: list[AspectScoreOut], *, mini: bool = False) -> str:
         out.append(f"<polygon points='{shape}' class='shape{' hollow' if full else ''}'/>")
     for i, v in enumerate(counted):
         nxt = counted[(i + 1) % 6]
+        j = (i + 1) % 6
         if v is not None and nxt is not None:
-            (x1, y1), (x2, y2) = _pos(i, v), _pos((i + 1) % 6, nxt)
+            (x1, y1), (x2, y2) = _pos(i, v), _pos(j, nxt)
             out.append(
                 f"<line x1='{x1:.1f}' y1='{y1:.1f}' x2='{x2:.1f}' y2='{y2:.1f}' "
                 "class='seg'/>"
+            )
+        elif not full and not mini:
+            # Close the outline with a dotted line to the open marker (drawn
+            # at 50) or the projected value, so the hexagon is always complete.
+            a = values[i] if values[i] is not None else 50
+            b = values[j] if values[j] is not None else 50
+            (x1, y1), (x2, y2) = _pos(i, a), _pos(j, b)
+            out.append(
+                f"<line x1='{x1:.1f}' y1='{y1:.1f}' x2='{x2:.1f}' y2='{y2:.1f}' "
+                "class='seg-open'/>"
             )
 
     for i, (code, short) in enumerate(ORDER):
@@ -141,6 +152,11 @@ def hexagon_svg(aspects: list[AspectScoreOut], *, mini: bool = False) -> str:
                 f"<title>{name}: projected {value:.0f}, not in the rating</title>"
                 "</circle>"
             )
+            if not mini:
+                out.append(
+                    f"<text x='{x:.1f}' y='{y - 12:.1f}' text-anchor='middle' "
+                    "class='star'>*</text>"
+                )
         else:
             x, y = _pos(i, 50)
             out.append(
@@ -393,6 +409,9 @@ svg.hex text { font-family: var(--body); fill: var(--fg); font-size: 12.5px;
 .shape { fill: var(--shape); stroke: none; }
 .shape.hollow { fill: none; }
 .seg { stroke: var(--accent); stroke-width: 2.2; stroke-linecap: round; }
+.seg-open { stroke: var(--accent); stroke-width: 1.6; stroke-dasharray: 4 4;
+  stroke-linecap: round; opacity: .8; }
+svg.hex text.star { fill: var(--accent); font-size: 20px; font-weight: 700; }
 .mini .seg { stroke-width: 4; }
 .mini .proj-shape { stroke-width: 3; }
 .mini .ring { stroke-width: 1.5; }
