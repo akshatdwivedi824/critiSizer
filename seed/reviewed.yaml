@@ -1880,6 +1880,21 @@ policies:
     outcome: too_early
     reason: Act passed Dec 2023; most provisions await Rules
     review_date: '2027-06-01'
+  - aspect: equity_impact
+    outcome: too_early
+    reason: The Act is being brought into force through rules that were still in draft, and few provisions
+      have been applied, so effects, court challenges and unequal burden cannot yet be assessed.
+    review_date: '2027-06-30'
+  - aspect: ground_level_harm
+    outcome: too_early
+    reason: The Act is being brought into force through rules that were still in draft, and few provisions
+      have been applied, so effects, court challenges and unequal burden cannot yet be assessed.
+    review_date: '2027-06-30'
+  - aspect: legal_challenges
+    outcome: too_early
+    reason: The Act is being brought into force through rules that were still in draft, and few provisions
+      have been applied, so effects, court challenges and unequal burden cannot yet be assessed.
+    review_date: '2027-06-30'
   - aspect: outcome_failure
     outcome: too_early
     reason: Act passed Dec 2023; most provisions await Rules
