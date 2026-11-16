@@ -10,6 +10,53 @@ policies:
   summary_source_url: null
   aims: []
   source_items:
+  - url: https://scroll.in/latest/1070210/family-of-agnipath-recruit-killed-in-landmine-blast-claims-rs-48-lakh-given-by-army-till-now
+    outlet: Scroll
+    published_at: null
+    excerpt: 'Family of Agnipath recruit killed in landmine blast claims only Rs 48 lakh given by Army
+      till now
+
+      Family of Agnipath recruit killed in landmine blast claims only Rs 48 lakh given by Army till now
+
+      A day earlier, the Army had said that the family had been paid Rs 98.39 lakh out of the total amount
+      due.
+
+      The family of Agnipath recruit Ajay Kumar, who died in a landmine blast in January, has claimed
+      that they received an amount of Rs 48 lakh so far from the Indian Army, NDTV reported on Thursday.
+
+      Ano'
+    content_hash: 06f0a8024a4a95110815d97e4816ee5f6bd19f9ab57861b053c6fb755bf2e9fe
+  - url: https://scroll.in/latest/1047113/sc-dismisses-two-pleas-challenging-delhi-hc-verdict-on-agnipath-scheme
+    outlet: Scroll
+    published_at: null
+    excerpt: 'SC dismisses two pleas challenging Delhi HC verdict on Agnipath scheme
+
+      SC dismisses two pleas challenging Delhi HC verdict on Agnipath scheme
+
+      One petitions challenged the validity of the scheme altogether, and the other sought directions
+      to complete recruitment that had started before its launch.
+
+      The Supreme Court on Monday dismissed two petitions challenging the Delhi High Court judgements
+      about recruitment into the armed forces under the Centre’s Agnipath scheme, PTI reported.
+
+      The Agnipath sch'
+    content_hash: 0c9f95ae59053601709b03532772f6ab7af77c12f5287983d2f9968f11b3c382
+  - url: https://scroll.in/latest/1044676/scroll_in
+    outlet: Scroll
+    published_at: null
+    excerpt: 'Delhi HC upholds validity of Agnipath scheme
+
+      Delhi HC upholds validity of Agnipath scheme
+
+      The High Court dismissed a batch of petitions challenging the Centre’s decision to introduce the
+      system for short-term military recruitment.
+
+      The Delhi High Court on Monday upheld the constitutional validity of the Agnipath scheme, dismissing
+      a batch of petitions challenging the Centre’s programme for short-term military recruitment, Live
+      Law reported.
+
+      A bench of Chief Justice Satish Chandra Sharma and Justi'
+    content_hash: 11aa64012609a32b3c6ef2cfcb7eb5e53364a97d4a0cb7f38486c686198238a4
   - url: https://timesofindia.indiatimes.com/city/kolkata/20-posts-in-police-other-depts-reserved-for-agniveers-cm/articleshow/133446422.cms
     outlet: The Times of India
     published_at: '2026-08-23T20:45:00+00:00'
@@ -36,6 +83,20 @@ policies:
 
       The government has now announced modifications to the scheme but has not gone'
     content_hash: 50cfb0cfe28356e019b2ebe398bc57c9de1b4596d271515d90a725299fcfbe89
+  - url: https://www.tribuneindia.com/news/ludhiana/amid-row-on-relief-agniveers-kin-admit-theyve-got-rs-98-lakh-636741
+    outlet: The Tribune
+    published_at: null
+    excerpt: 'Amid row on relief, Agniveer''s kin admit they''ve got Rs 98 lakh
+
+      Amid row on relief, Ludhiana Agniveer’s kin admit they’ve got Rs 98 lakh
+
+      Deceased Ajay Kumar’s family to receive Rs 67 lakh more | Congress seeks White Paper on compensation
+      paid to families of slain Agniveers
+
+      The family of deceased “Agniveer” Ajay Kumar Singh, which yesterday created a political storm by
+      claiming that it was yet to receive any compensation from the Union Government, today did a part
+      course correction and admitted t'
+    content_hash: 819851819111facc2024a699cd985b224dc20ac8f6994a12d714cf66abe35b4a
   - url: https://timesofindia.indiatimes.com/toi-plus/defence-security/serving-the-indian-army-is-far-better-than-low-paying-gulf-jobs-why-gorkha-veterans-are-angry-with-nepal-govt/articleshow/133372720.cms
     outlet: The Times of India
     published_at: '2026-08-20T10:30:00+00:00'
@@ -76,6 +137,45 @@ policies:
       Lok Sabha election manifesto that it would scrap the scheme and revert to the old '
     content_hash: d16f021b24d9bf22d152e0f4cf130a9f2887d44ae06f819d5a0674899fcb39c1
   indicators:
+  - aspect: ground_level_harm
+    name: Protests across states by aspirants
+    score: 45.0
+    weight: 1.0
+    description: The announcement of the recruitment scheme triggered protests across several states.
+    model: gemini:gemini-3.5-flash-lite
+    prompt_version: prompt_v4
+    evidence_status: realised
+    projection_source: null
+    evidence:
+    - url: https://scroll.in/latest/1044676/scroll_in
+      title: Delhi HC upholds validity of Agnipath scheme
+      tier: 2
+      multiplier: 1.0
+      content_hash: 24ee03c050f65e20ca33099041d3975303d416e4c70709786de8d8aa79ef119a
+      archived_location: null
+      quote: The announcement had triggered protests across several states as aspirants demanded permanent
+        recruitment with pension benefits.
+      source_item: 11aa64012609a32b3c6ef2cfcb7eb5e53364a97d4a0cb7f38486c686198238a4
+  - aspect: legal_challenges
+    name: Petition challenging introduction without parliamentary law
+    score: 35.0
+    weight: 1.0
+    description: A petition argued that the scheme could not have been introduced without passing a law
+      in Parliament.
+    model: gemini:gemini-3.5-flash-lite
+    prompt_version: prompt_v4
+    evidence_status: realised
+    projection_source: null
+    evidence:
+    - url: https://scroll.in/latest/1047113/sc-dismisses-two-pleas-challenging-delhi-hc-verdict-on-agnipath-scheme
+      title: SC dismisses two pleas challenging Delhi HC verdict on Agnipath scheme
+      tier: 2
+      multiplier: 1.0
+      content_hash: 27e8b31595fc766bf79c3cf120e6518dda9b96ef1caac52c1ff4d6f032d32ea0
+      archived_location: null
+      quote: In this plea, Advocate ML Sharma had argued that the scheme could not have been introduced
+        without passing a law in Parliament, Live Law reported.
+      source_item: 0c9f95ae59053601709b03532772f6ab7af77c12f5287983d2f9968f11b3c382
   - aspect: transparency_gap
     name: Unclarified pension eligibility for extended service tenure
     score: 20.0
@@ -96,7 +196,17 @@ policies:
       quote: The media briefing by the Chief of Defence Staff on Agnipath did not clarify whether these
         six years will be counted for pension or not.
       source_item: 50cfb0cfe28356e019b2ebe398bc57c9de1b4596d271515d90a725299fcfbe89
-  aspect_reviews: []
+  aspect_reviews:
+  - aspect: cost_waste
+    outcome: too_early
+    reason: The first Agniveers complete their four-year terms from late 2026, so retention, savings and
+      effects on the forces cannot yet be assessed.
+    review_date: '2027-06-30'
+  - aspect: outcome_failure
+    outcome: too_early
+    reason: The first Agniveers complete their four-year terms from late 2026, so retention, savings and
+      effects on the forces cannot yet be assessed.
+    review_date: '2027-06-30'
   withdrawn:
   - aspect: ground_level_harm
     name: Uncertainty affecting Agniveers' motivation
