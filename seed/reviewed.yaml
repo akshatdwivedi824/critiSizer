@@ -664,6 +664,18 @@ policies:
 
       Electoral bonds that are within the validity period of 15 days but have '
     content_hash: 27b8bd8f158ce00c0adc1ca8f9d7d776f4f857e22720e14eb73d4726770066f7
+  - url: https://scroll.in/article/1065267/after-raids-by-central-agencies-these-21-companies-purchased-electoral-bonds
+    outlet: Scroll
+    published_at: null
+    excerpt: 'After raids by central agencies, these 21 companies purchased electoral bonds
+
+      Several companies bought electoral bonds after they were faced with action by central government
+      agencies such as the Enforcement Directorate, the Income Tax Department, the Central Bureau of Investigation
+      and the Goods and Service Tax authorities, an analysis by Project Electoral Bond shows.
+
+      They include companies in the top five donors list, such as Future Gaming and Hotel Services PR,
+      Megha Engineering and Infrastru'
+    content_hash: 4654b414e9881e9c482f88682c1d3f647c0fd7481b05264812139cdbee1fe142
   - url: https://www.deccanherald.com/business/govt-printed-265-lakh-electoral-bonds-of-rs-1000-and-rs-10000-each-but-sold-only-118-since-2018-923646.html
     outlet: Deccan Herald
     published_at: null
@@ -760,6 +772,17 @@ policies:
       in 2018. Through it, companies and individuals in India can make anonymous donations to political
       parties. Significantly, the apex court has '
     content_hash: cc8c3207d40dc18f2bb574d311159e3766c2fe13b66072560a5ffb9788dfc2dc
+  - url: https://thewire.in/business/top-electoral-bond-purchasers-include-some-companies-that-were-raided-or-under-the-scanner
+    outlet: The Wire
+    published_at: null
+    excerpt: 'Top electoral bond purchasers include some companies that were raided or under the scanner
+
+      New Delhi/Mumbai: Future Gaming and Hotel Services and Megha Engineering Infrastructure Limited
+      are the top purchasers of electoral bonds from April 2019 to January 2024, having purchased bonds
+      worth Rs 1,368 and Rs 980 crores, respectively, according to data uploaded by the Election Commission
+      of India on its website. Both have both been under the lens of the Enforcement Directorate (ED)
+      and Income Tax de'
+    content_hash: ded3ff01344f6f2d858fded7f9832e28eaa37b6ec567c1a8fd769fd3af931ba2
   - url: https://www.tribuneindia.com/news/india/megha-engg-qwik-bjps-top-donors-603076
     outlet: The Tribune
     published_at: null
@@ -857,6 +880,27 @@ policies:
       quote: Opposition parties and critics have said the electoral bonds scheme and the anonymity which
         came along with it provided an unfair advantage to the ruling party.
       source_item: 4bfb5a4c6ec6c3f363f40aec8dc7a19cf1507c0f9ab3228e68e117a122c96467
+  - aspect: ground_level_harm
+    name: Risk of quid pro quo between donors and parties
+    score: 30.0
+    weight: 1.0
+    description: The court recognised a legitimate possibility that large anonymous contributions lead
+      to quid pro quo arrangements, which would harm citizens' interests in clean governance.
+    model: reviewer
+    prompt_version: null
+    evidence_status: projected
+    projection_source: the Supreme Court's February 2024 judgment, as quoted by The Wire
+    evidence:
+    - url: https://thewire.in/law/electoral-bonds-top-supreme-court-quotes
+      title: 'Electoral Bonds Scheme Violative of Voter’s Right to Information: Top Quotes From the Supreme
+        Court'
+      tier: 2
+      multiplier: 1.0
+      content_hash: 7af86c757298f624f70cbcfbf9154efd844bc31479217e480236751c543716d8
+      archived_location: null
+      quote: there is a legitimate possibility that financial contribution to a political party would
+        lead to quid pro quo arrangements
+      source_item: 5e75c2139ac6807d522d071f8edf48d321d14123d7788b036548c2dcbd4b1011
   - aspect: legal_challenges
     name: Amendments to the Companies Act declared unconstitutional
     score: 85.0
