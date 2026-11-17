@@ -456,9 +456,9 @@ blockquote cite { display: block; font-style: normal; color: var(--muted);
 .intro p { color: var(--muted); max-width: 65ch; margin: 10px 0 14px; }
 .plist { display: grid; gap: 12px; }
 .pcard { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 16px;
-  align-items: center; background: var(--surface); border: 1px solid var(--line);
-  border-radius: 12px; padding: 14px 18px; text-decoration: none; }
-.pcard:hover { border-color: var(--accent); }
+  align-items: center; padding: 10px 0; text-decoration: none; color: var(--fg);
+  opacity: 0.62; transition: opacity 0.18s ease; }
+.pcard:hover, .pcard:focus-visible { opacity: 1; }
 .pcard svg.hex.mini { width: 84px; height: 84px; }
 .pcard h3 { font-size: 18px; }
 .pcard h3 span { color: var(--muted); font-weight: 500; }
