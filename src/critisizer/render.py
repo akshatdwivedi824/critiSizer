@@ -413,7 +413,7 @@ svg.hex text.star { fill: var(--accent); font-size: 20px; font-weight: 700; }
 .note { color: var(--muted); font-size: 13px; margin: 0; }
 .sect-h { font-size: 22px; }
 .aspects { display: grid; gap: 12px; grid-template-columns: repeat(2, minmax(0, 1fr));
-  align-items: stretch; }
+  align-items: start; }
 @media (max-width: 900px) { .aspects { grid-template-columns: minmax(0, 1fr); } }
 .aspects .starnote { grid-column: 1 / -1; }
 .starnote { color: var(--muted); font-size: 12.5px; margin: 2px 4px 0; }
