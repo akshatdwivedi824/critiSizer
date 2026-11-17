@@ -248,7 +248,8 @@ def aspect_card(aspect: AspectScoreOut, summary: str | None = None) -> str:
     return (
         "<details class='aspect' open>"
         f"<summary><h3>{escape(aspect.name)}</h3>"
-        f"<span class='q'>{escape(question)}</span>{_badge(aspect)}</summary>"
+        f"<span class='q'>{escape(question)}</span>{_badge(aspect)}"
+        "<span class='chev' aria-hidden='true'></span></summary>"
         f"<div class='body'>{_aspect_body(aspect, summary)}</div></details>"
     )
 
@@ -419,9 +420,15 @@ svg.hex text.star { fill: var(--accent); font-size: 20px; font-weight: 700; }
 .aspect { border: 1px solid var(--line); border-radius: 10px;
   background: var(--surface); }
 .aspect > summary { list-style: none; cursor: pointer; padding: 14px 16px;
-  display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 4px 16px;
+  display: grid; grid-template-columns: minmax(0, 1fr) auto auto; gap: 4px 14px;
   align-items: center; }
 .aspect > summary::-webkit-details-marker { display: none; }
+.chev { grid-row: 1 / span 2; grid-column: 3; justify-self: center; width: 9px;
+  height: 9px; margin-top: -4px; border-right: 2px solid var(--muted);
+  border-bottom: 2px solid var(--muted); transform: rotate(45deg);
+  transition: transform 0.18s ease, border-color 0.18s ease; }
+.aspect:not([open]) .chev { transform: rotate(-135deg); margin-top: 4px; }
+.aspect > summary:hover .chev { border-color: var(--accent); }
 .aspect h3 { font-size: 17px; }
 .aspect .q { color: var(--muted); font-size: 13px; grid-column: 1; }
 .badge { font-family: var(--head); font-weight: 700; font-size: 22px;
