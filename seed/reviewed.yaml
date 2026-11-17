@@ -306,6 +306,20 @@ policies:
   summary_source_url: null
   aims: []
   source_items:
+  - url: https://scroll.in/latest/1040990/scroll_in
+    outlet: Scroll
+    published_at: null
+    excerpt: 'Supreme Court upholds demonetisation by 4:1 majority
+
+      Supreme Court upholds demonetisation by 4:1 majority
+
+      Justice BV Nagarathna, in her dissenting judgement, said that the 2016 exercise was unlawful but
+      there is no point in striking it down now.
+
+      The 2016 demonetisation exercise cannot be struck down on the grounds of proportionality or the
+      process followed to make the decision, the Supreme Court said in a 4:1 judgement on Monday on a
+      batch of petitions challenging the government’s move to ban Rs'
+    content_hash: 2ef7ef566fbb468adadfb5fe1a02ec4cc277d4f3df26cb9a14ec5603b80cbd76
   - url: https://thewire.in/economy/modis-demonetisation-move-may-have-permanently-damaged-indias-informal-sector
     outlet: The Wire
     published_at: null
@@ -341,6 +355,19 @@ policies:
 
       The data flies in the face of what the Centre had claimed when its announced its decision to b'
     content_hash: 57cba65afb2de539049bcdc65219f6fddd52c99b26d43fa6fea786946dca57ed
+  - url: https://scroll.in/latest/1041027/scroll_in
+    outlet: Scroll
+    published_at: null
+    excerpt: 'Dissenting verdict on demonetisation is a ‘welcome slap’ on Centre’s wrist, says Congress
+
+      Dissenting verdict on demonetisation is a ‘welcome slap’ on Centre’s wrist, says Congress
+
+      While four Supreme Court judges said that the decision cannot be struck down, Justice BV Nagarathna
+      held the exercise was unlawful.
+
+      The Supreme Court’s dissenting verdict on the 2016 demonetisation exercise may only be a slap on
+      the wrist of the Central government but it is a welcome one, Congress MP P Chidambaram said'
+    content_hash: 7b24783969a0f31838f55597620cabd2d6b826f8b8cbe495b3f4f646d0f31c1c
   - url: https://thewire.in/economy/demonetisation-a-gimmick-to-distract-from-ineffectual-governance-say-civil-society-members
     outlet: The Wire
     published_at: null
@@ -427,6 +454,46 @@ policies:
         years respectively during the first 50 days of demonetisation.People standing in long queues to
         exchange their old Rs 500 and 1000 notes and withdraw cash from the ATM in New Delhi.
       source_item: 499c4cf89e1e0381ade7890193e9cb5bf6c4cde698a2d3268be57831f0c3badb
+  - aspect: legal_challenges
+    name: Dissenting Supreme Court judgment finds exercise unlawful
+    score: 60.0
+    weight: 1.0
+    description: Justice Nagarathna, dissenting from the 4-1 ruling that upheld demonetisation, held the
+      2016 exercise unlawful but said there was no point striking it down now.
+    model: gemini:gemini-3.5-flash-lite
+    prompt_version: prompt_v4
+    evidence_status: realised
+    projection_source: null
+    evidence:
+    - url: https://scroll.in/latest/1040990/scroll_in
+      title: Supreme Court upholds demonetisation by 4:1 majority
+      tier: 2
+      multiplier: 1.0
+      content_hash: cc198df67a3a656dc3dd25109cefb07736e12f4ea5e9c2d63a43a53753be9847
+      archived_location: null
+      quote: Justice BV Nagarathna, in her dissenting judgement, said that the 2016 exercise was unlawful
+        but there is no point in striking it down now.
+      source_item: 2ef7ef566fbb468adadfb5fe1a02ec4cc277d4f3df26cb9a14ec5603b80cbd76
+  - aspect: legal_challenges
+    name: Petitions challenging demonetisation heard by Supreme Court
+    score: 40.0
+    weight: 1.0
+    description: A Constitution Bench heard 58 petitions challenging the 2016 decision; the Supreme Court
+      upheld it by a 4-1 majority.
+    model: gemini:gemini-3.5-flash-lite
+    prompt_version: prompt_v4
+    evidence_status: realised
+    projection_source: null
+    evidence:
+    - url: https://scroll.in/latest/1040990/scroll_in
+      title: Supreme Court upholds demonetisation by 4:1 majority
+      tier: 2
+      multiplier: 1.0
+      content_hash: d979837f88a25800dfc0558c7199c60e0abc5cb69f854b24c9dccae816c4ab81
+      archived_location: null
+      quote: A Constitution Bench of Justices S Abdul Nazeer, Gavai, AS Bopanna, V Ramasubramanian and
+        Nagarathna had heard 58 petitions challenging the government’s 2016 decision.
+      source_item: 2ef7ef566fbb468adadfb5fe1a02ec4cc277d4f3df26cb9a14ec5603b80cbd76
   - aspect: outcome_failure
     name: Currency returned to banking system exceeded government projections
     score: 70.0
@@ -1593,6 +1660,17 @@ policies:
       and simplifying doing business across states. But three months later, businesses are struggling
       to cope with the change. This series explores the problems they are facing, with the focu'
     content_hash: c7cb340e4f9e2bfaef6c73a3ec455bee81ebba272d29c936477eff13291db331
+  - url: https://www.deccanherald.com/business/secrecy-in-gst-decisions-not-good-for-tax-reform-574334.html
+    outlet: Deccan Herald
+    published_at: null
+    excerpt: '''Secrecy in GST decisions not good for tax reform''
+
+      Days ahead of the GST Council meeting on February 18, which is expected to finalise model GST laws,
+      the National Institute of Public Finance and Policy, a research body under the Ministry of Finance
+      on Monday warned over the level of secrecy on GST decisions. . It said the level of secrecy was
+      not conducive for tax reform like GST which will touch upon day-to-day economic activities of all
+      sectors of the economy. “Decisions of the GST council ar'
+    content_hash: d85f788a898562c9f927f3cca07a45a49e947268305e4face6d0f1e1cf05c9fe
   indicators:
   - aspect: cost_waste
     name: Working capital blockage from delayed refunds
@@ -1815,6 +1893,27 @@ policies:
       quote: Over 25 odd technical glitches, led to the crash of the GST portal on at least two occasions
         in the very first month of return filing.
       source_item: 8e9e19e147c88029025f4a54d3f79bd213860041aa12e289336b725f77a616a1
+  - aspect: transparency_gap
+    name: Non-disclosure of GST Council decisions
+    score: 75.0
+    weight: 1.0
+    description: Decisions made by the GST Council are not disclosed in the public domain, preventing
+      informed public debate.
+    model: gemini:gemini-3.5-flash-lite
+    prompt_version: prompt_v4
+    evidence_status: realised
+    projection_source: null
+    evidence:
+    - url: https://www.deccanherald.com/business/secrecy-in-gst-decisions-not-good-for-tax-reform-574334.html
+      title: '''Secrecy in GST decisions not good for tax reform'''
+      tier: 2
+      multiplier: 1.0
+      content_hash: 66787ebe1cb70cd9dd8f788e1696d62d70b478c2096ac2eb4eae0d9aef51c336
+      archived_location: null
+      quote: “Decisions of the GST council are not disclosed in the public domain by the Council and there
+        is hardly any informed public debate on these issues,” said NIPFP associate professor Sacchidananda
+        Mukherjee in a research note.
+      source_item: d85f788a898562c9f927f3cca07a45a49e947268305e4face6d0f1e1cf05c9fe
   aspect_reviews: []
   withdrawn: []
 - slug: spectrum-allocation-2g-2008
