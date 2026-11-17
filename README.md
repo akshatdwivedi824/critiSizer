@@ -129,17 +129,22 @@ uv run python scripts/export_reviewed.py       # writes seed/reviewed.yaml
 
 ## Known limits
 
-- **Four of the eight policies are not rated yet:** the Digital Personal Data
-  Protection Act, the 2G spectrum allocation, Agnipath and the Telecommunications
-  Act. They have fewer than four assessed aspects, and the site says so instead of
-  showing a number.
+- **Six of the eight policies are rated.** The Digital Personal Data Protection
+  Act and the Telecommunications Act are not: each has fewer than four aspects
+  assessed on realised evidence, and the rest are marked "too early" with a
+  reason and a date to look again (May and June 2027). The site says so instead
+  of showing a number.
 - **Thin sources.** Several policies rest on a handful of articles from two to
-  four outlets. Each page states how many sources and outlets it uses.
+  six outlets, and Demonetisation on only two. Each page states how many sources
+  and outlets it uses. A "no negative evidence" finding means none was found in
+  those sources, not that none exists.
 - **Free hosting.** The app sleeps when idle and the free database is replaced
   about every month, so the data is re-imported from `seed/reviewed.yaml` on
   deploy.
 - **Projected values** come from a named source, carry a star, and are excluded
-  from the rating.
+  from the rating. Only Electoral Bonds has one so far.
+- **Court rulings that upheld a policy** are not counted as criticism of it.
+  Only the challenge itself is recorded, and the finding states how it ended.
 - **Not built:** a celebrity comparator, a full load test and failure drills on
   the new data path, and a second prompt version.
 
