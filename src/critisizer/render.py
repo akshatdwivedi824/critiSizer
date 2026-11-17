@@ -457,12 +457,13 @@ blockquote cite { display: block; font-style: normal; color: var(--muted);
 .plist { display: grid; gap: 12px; }
 .pcard { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 16px;
   align-items: center; padding: 10px 0; text-decoration: none; color: var(--fg);
-  opacity: 0.62; transition: opacity 0.18s ease; }
-.pcard:hover, .pcard:focus-visible { opacity: 1; }
+  transition: color 0.18s ease; }
+.pcard:hover, .pcard:focus-visible { color: var(--accent); }
 .pcard svg.hex.mini { width: 84px; height: 84px; }
 .pcard h3 { font-size: 18px; }
-.pcard h3 span { color: var(--muted); font-weight: 500; }
-.pcard p { margin: 4px 0 0; color: var(--muted); font-size: 14px; }
+.pcard h3 span { color: inherit; font-weight: 500; }
+.pcard p { margin: 4px 0 0; color: inherit; font-size: 14px; }
+.pcard .pscore small { color: inherit; }
 .pscore { text-align: right; font-family: var(--head); font-weight: 700;
   font-size: 30px; font-variant-numeric: tabular-nums; }
 .pscore small { display: block; font-family: var(--body); font-weight: 400;
