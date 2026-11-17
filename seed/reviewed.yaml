@@ -1384,6 +1384,38 @@ policies:
       Deputy Chairman Harivansh '
     content_hash: ec5897173179ac144e47a250486156afea6cdd7063d10aa787f155293aaa9f66
   indicators:
+  - aspect: equity_impact
+    name: Impact on small and poor farmers
+    score: 45.0
+    weight: 1.0
+    description: Critics stated that the deregulation laws may end up hurting small and poor farmers who
+      lack bargaining power.
+    model: gemini:gemini-3.5-flash-lite
+    prompt_version: prompt_v4
+    evidence_status: realised
+    projection_source: null
+    evidence:
+    - url: https://scroll.in/article/980171/scroll_in
+      title: India’s uninspiring record of deregulating farming could explain why many are worried about
+        new laws
+      tier: 2
+      multiplier: 1.0
+      content_hash: 4c424c2078d02ffbccd5d006361cd29af21a9e0f51db6937c84787229129e46d
+      archived_location: null
+      quote: By weakening the government’s price guarantee system, the laws may end up hurting small and
+        poor farmers, who form 80% of the sector and 23% of those who live below the poverty line, say
+        critics.
+      source_item: 694ee34ce50b4113bf730767a563a215963cbd1bc3c8e371146b5ba1c0b17a66
+    - url: https://scroll.in/article/980171/scroll_in
+      title: India’s uninspiring record of deregulating farming could explain why many are worried about
+        new laws
+      tier: 2
+      multiplier: 1.0
+      content_hash: 54f3c940cf977a4b34fc9389ddf83e5c5b7cf9e4b9fc2599e2fbf6f37106442d
+      archived_location: null
+      quote: These changes will affect the small farmers the most because their low output does not allow
+        them any bargaining power.
+      source_item: 694ee34ce50b4113bf730767a563a215963cbd1bc3c8e371146b5ba1c0b17a66
   - aspect: ground_level_harm
     name: Violence and death in protests
     score: 75.0
