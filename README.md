@@ -53,7 +53,8 @@ from named news outlets.
 
 The model never writes a projection. A projection is entered by a reviewer, must
 name its source, and must quote text already collected for that policy
-(`scripts/add_projection.py`).
+(`scripts/add_projection.py`). A reviewer can also fill an empty aspect by hand
+under the same rules (`scripts/add_indicator.py`).
 
 ```mermaid
 flowchart LR
@@ -138,6 +139,15 @@ uv run python scripts/export_reviewed.py       # writes seed/reviewed.yaml
   six outlets, and Demonetisation on only two. Each page states how many sources
   and outlets it uses. A "no negative evidence" finding means none was found in
   those sources, not that none exists.
+- **Open aspects.** Demonetisation (cost) and the 2G spectrum allocation
+  (outcome and harm) have no usable evidence in sources from the allowed
+  outlets, so they are shown as not yet assessed. They are not marked "no
+  negative evidence", because that would count them as zero.
+- **Reviewer-written indicators.** One policy (Farm laws, transparency) has two
+  indicators written by the reviewer, not the model, because the model kept
+  picking an unrelated passage. Each still needs a verbatim quote from a stored
+  source on the allow-list, is recorded in the audit log and is labelled
+  `reviewer` in the data (`scripts/add_indicator.py`).
 - **Free hosting.** The app sleeps when idle and the free database is replaced
   about every month, so the data is re-imported from `seed/reviewed.yaml` on
   deploy.

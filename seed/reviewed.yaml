@@ -1584,6 +1584,46 @@ policies:
       archived_location: null
       quote: I would like to announce to everyone that we have decided to repeal these laws.
       source_item: 8dd23efd7b565595c2804daaaab5b9ec812e93326be75f9c6f053763f24425e0
+  - aspect: transparency_gap
+    name: Bills passed by voice vote, division refused
+    score: 70.0
+    weight: 1.0
+    description: The Rajya Sabha passed the farm bills by voice vote; the opposition's demand for a division
+      and for referral to a select committee was not accepted.
+    model: reviewer
+    prompt_version: null
+    evidence_status: realised
+    projection_source: null
+    evidence:
+    - url: https://thewire.in/agriculture/farm-bills-opposition-bjp-rajya-sabha
+      title: '''Death Warrant'': Opposition Slams Rushed Passing of Two Controversial Farm Bills'
+      tier: 2
+      multiplier: 1.0
+      content_hash: 56aa04f8e87e7f1323fbb23c116f52ca1e24a0f8337a7233518884a2a93795d1
+      archived_location: null
+      quote: The bills were passed by a choice vote and not a division of votes, even though the Congress,
+        TMC and Left made a demand to the deputy chairperson.
+      source_item: 2d86bc3c211cd8ea254890d59094f27ec536908a0487a37659cb078f390e6a7a
+  - aspect: transparency_gap
+    name: Farmers say they were not consulted
+    score: 50.0
+    weight: 1.0
+    description: A farm-economics professor says farmers believe they were not consulted before the laws,
+      which touch state subjects.
+    model: reviewer
+    prompt_version: null
+    evidence_status: alleged
+    projection_source: null
+    evidence:
+    - url: https://scroll.in/article/980072/scroll_in
+      title: Change in social contract between farmers and Centre is fuelling distrust, says IIM-A professor
+      tier: 2
+      multiplier: 1.0
+      content_hash: 0c9f25d751c1d1c3f678141757fdefbaf7c4018d7176aa4493985d042de5d4dd
+      archived_location: null
+      quote: One of the reasons farmers are protesting is because they think that they were not consulted
+        before making these far-reaching changes
+      source_item: c5f5debf5e1f1a3ebd10a65a24ea197cc6ce2e7713071c41f94f386efe39064b
   aspect_reviews:
   - aspect: cost_waste
     outcome: no_negative_evidence
