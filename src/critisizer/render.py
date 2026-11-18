@@ -368,9 +368,15 @@ svg.hex.mini { width: 150px; height: 150px; }
   letter-spacing: 0.06em; }
 .facts dd { margin: 2px 0 0; }
 .top { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-  gap: 24px; align-items: stretch; }
+  gap: 0; align-items: stretch; }
+.top > .card { background: none; border: 0; border-radius: 0;
+  padding: 20px 28px 20px 0; }
+.top > .card + .card { border-left: 1px solid var(--line); padding: 20px 0 20px 28px; }
 @media (max-width: 760px) {
   .top, .nutshell { grid-template-columns: minmax(0, 1fr); }
+  .top > .card { padding-right: 0; }
+  .top > .card + .card { border-left: 0; border-top: 1px solid var(--line);
+    padding: 20px 0 0; }
 }
 .score .num { font-family: var(--head); font-weight: 700; font-size: 64px;
   line-height: 1; font-variant-numeric: tabular-nums; }
