@@ -362,9 +362,14 @@ svg.hex.mini { width: 150px; height: 150px; }
 .nutshell { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
   gap: 28px; }
 .nutshell p { margin: 0 0 12px; max-width: 65ch; }
-.card.nutshell { background: none; border: 0; border-radius: 0;
-  border-top: 1px solid var(--line); border-bottom: 1px solid var(--line);
-  padding: 0; margin: 0 4px; gap: 0; }
+.card.nutshell { background: none; border: 0; border-radius: 0; position: relative;
+  padding: 0; margin: 0 4px; gap: 0;
+  --ext: max(0px, min(160px, calc((100vw - 100%) / 2 - 24px))); }
+.card.nutshell::before, .card.nutshell::after { content: ""; position: absolute;
+  left: calc(-1 * var(--ext)); right: calc(-1 * var(--ext)); height: 1px;
+  background: var(--line); pointer-events: none; }
+.card.nutshell::before { top: 0; }
+.card.nutshell::after { bottom: 0; }
 .card.nutshell > div { padding: 22px 28px 22px 0; }
 .card.nutshell > .facts { padding: 22px 0 22px 28px;
   border-left: 1px solid var(--line); }
