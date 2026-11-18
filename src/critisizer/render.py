@@ -412,18 +412,11 @@ svg.hex text.star { fill: var(--accent); font-size: 20px; font-weight: 700; }
 .critique p { margin: 0 0 12px; max-width: 65ch; }
 .note { color: var(--muted); font-size: 13px; margin: 0; }
 .sect-h { font-size: 22px; }
-.aspects { display: grid; gap: 0; grid-template-columns: repeat(2, minmax(0, 1fr));
-  align-items: start; border-top: 1px solid var(--line); }
-@media (max-width: 900px) {
-  .aspects { grid-template-columns: minmax(0, 1fr); }
-  .aspects > .aspect:nth-child(odd) { border-right: 0; }
-}
+.aspects { display: grid; gap: 0; grid-template-columns: minmax(0, 1fr);
+  border-top: 1px solid var(--line); }
 .aspects .starnote { grid-column: 1 / -1; }
-.starnote { color: var(--muted); font-size: 12.5px; margin: 2px 4px 0; }
+.starnote { color: var(--muted); font-size: 12.5px; margin: 8px 16px 0; }
 .aspect { border-bottom: 1px solid var(--line); }
-.aspects > .aspect:nth-child(odd) { border-right: 1px solid var(--line); }
-.aspects > .aspect:nth-child(even) > summary,
-.aspects > .aspect:nth-child(even) > .body { padding-left: 24px; }
 .aspect > summary { list-style: none; cursor: pointer; padding: 14px 16px;
   display: grid; grid-template-columns: minmax(0, 1fr) auto auto; gap: 4px 14px;
   align-items: center; }
