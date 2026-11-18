@@ -362,6 +362,10 @@ svg.hex.mini { width: 150px; height: 150px; }
 .nutshell { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
   gap: 28px; }
 .nutshell p { margin: 0 0 12px; max-width: 65ch; }
+.card.nutshell { background: none; border: 0; border-radius: 0;
+  border-top: 1px solid var(--line); border-bottom: 1px solid var(--line);
+  padding: 22px 0; margin: 0 16px; }
+.card.nutshell .facts div:first-child { border-top: 0; padding-top: 0; }
 .facts { margin: 0; display: grid; gap: 12px; align-content: start; font-size: 14px; }
 .facts div { border-top: 1px solid var(--line); padding-top: 8px; }
 .facts dt { color: var(--muted); font-size: 12px; text-transform: uppercase;
