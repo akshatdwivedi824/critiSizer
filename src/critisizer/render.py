@@ -411,19 +411,19 @@ svg.hex text.star { fill: var(--accent); font-size: 20px; font-weight: 700; }
 .starnote { color: var(--muted); font-size: 12.5px; margin: 8px 16px 0; }
 .aspect { border-bottom: 1px solid var(--line); }
 .aspect > summary { list-style: none; cursor: pointer; padding: 14px 16px;
-  display: grid; grid-template-columns: minmax(0, 1fr) auto auto; gap: 4px 14px;
+  display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 4px 14px;
   align-items: center; }
 .aspect > summary::-webkit-details-marker { display: none; }
-.chev { grid-row: 1 / span 2; grid-column: 3; justify-self: center; width: 9px;
-  height: 9px; margin-top: -4px; border-right: 2px solid var(--muted);
-  border-bottom: 2px solid var(--muted); transform: rotate(45deg);
+.chev { grid-row: 1 / span 2; grid-column: 1; justify-self: center; width: 9px;
+  height: 9px; border-right: 2px solid var(--muted);
+  border-bottom: 2px solid var(--muted); transform: translate(0, -3px) rotate(45deg);
   transition: transform 0.18s ease, border-color 0.18s ease; }
-.aspect:not([open]) .chev { transform: rotate(-135deg); margin-top: 4px; }
+.aspect:not([open]) .chev { transform: translate(-2px, 0) rotate(-45deg); }
 .aspect > summary:hover .chev { border-color: var(--accent); }
-.aspect h3 { font-size: 17px; }
-.aspect .q { color: var(--muted); font-size: 13px; grid-column: 1; }
+.aspect h3 { font-size: 17px; grid-column: 2; }
+.aspect .q { color: var(--muted); font-size: 13px; grid-column: 2; }
 .badge { font-family: var(--head); font-weight: 700; font-size: 22px;
-  font-variant-numeric: tabular-nums; grid-row: 1 / span 2; grid-column: 2;
+  font-variant-numeric: tabular-nums; grid-row: 1 / span 2; grid-column: 3;
   text-align: right; }
 .badge.dim { color: var(--muted); }
 .badge.clear { color: var(--clear); }
