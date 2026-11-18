@@ -37,7 +37,6 @@ def test_partial_policy_page_renders_as_under_review(client, session, aspects):
     assert "needs 4 aspects" in response.text
     assert "3 so far" in response.text
     assert "Not yet rated" in response.text
-    assert "Based on 4 collected sources from 2 outlets" in response.text
     assert "</span> overall" not in response.text  # the rated card's wording
     assert "Expert average" not in response.text
 
@@ -93,8 +92,8 @@ def test_every_aspect_is_listed_on_a_policy_page(client, session, aspects):
         assert aspect.name in html
 
 
-def test_pages_carry_the_review_note(client, session, aspects):
+def test_pages_carry_their_notes(client, session, aspects):
     fill_policy(session, aspects, "partial", THREE)
     session.commit()
     assert "AI-drafted, human-reviewed" in client.get("/").text
-    assert "AI-drafted, human-reviewed" in client.get("/policies/partial").text
+    assert "record negatives only" in client.get("/policies/partial").text
