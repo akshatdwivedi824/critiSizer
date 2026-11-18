@@ -18,11 +18,11 @@ from critisizer.schemas import (
     PolicyDetail,
 )
 
-DISCLAIMER = (
+SCOPE_NOTE = (
     "Scores are editorial and record negatives only; this is not a full "
-    "evaluation of any policy. Higher means more documented criticism. "
-    f"{REVIEW_NOTE}."
+    "evaluation of any policy. Higher means more documented criticism."
 )
+DISCLAIMER = f"{SCOPE_NOTE} {REVIEW_NOTE}."
 NONE_FOUND = "No negative evidence found in the collected sources"
 
 # Fixed order round the hexagon, clockwise from the top: (code, short label).
@@ -289,13 +289,6 @@ def critique_html(view: PolicyDetail, extras: PageExtras) -> str:
     return "".join(rows)
 
 
-def _people_line(view: PolicyDetail) -> str:
-    count = view.people_rating_count
-    if view.people_rating is not None:
-        return f"People's rating: {view.people_rating:.1f} ({count} ratings)"
-    return f"People's rating: not shown yet ({count} ratings so far)"
-
-
 def _facts_html(view: PolicyDetail, extras: PageExtras) -> str:
     """Key facts: the written ones when there are any, else what is on record."""
     rows = [(escape(k), escape(v)) for k, v in extras.facts]
@@ -549,27 +542,10 @@ def layout(title: str, body: str, *, search: bool = False) -> str:
 # ------------------------------------------------------------------ pages
 
 
-def _depth(view: PolicyDetail) -> str:
-    if not view.source_count:
-        return ""
-    return (
-        f"Based on {view.source_count} collected sources "
-        f"from {view.outlet_count} outlets."
-    )
-
-
 def _footer(view: PolicyDetail) -> str:
-    parts = [
-        f"<span class='tag'>{escape(REVIEW_NOTE)}</span>",
-        f"<span class='tag'>Method {escape(view.method_version)}</span>",
-        f"<span>Rated on {view.aspects_assessed} of {view.aspects_total} aspects</span>",
-    ]
-    if _depth(view):
-        parts.append(f"<span>{_depth(view)}</span>")
-    if view.rated:
-        parts.append(f"<span>{escape(_people_line(view))}</span>")
-    parts.append(f"<span>{escape(DISCLAIMER)}</span>")
-    return f"<footer class='foot'>{''.join(parts)}</footer>"
+    """Just the scope note. The tags, aspect count, source depth, people's
+    rating line and the AI-drafted note are not shown on the policy page."""
+    return f"<footer class='foot'><span>{escape(SCOPE_NOTE)}</span></footer>"
 
 
 def policy_html(view: PolicyDetail, extras: PageExtras, needed: int) -> str:
