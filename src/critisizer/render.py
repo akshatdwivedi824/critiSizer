@@ -499,25 +499,49 @@ blockquote cite { display: block; font-style: normal; color: var(--muted);
 """
 
 HEAD_SCRIPT = (
-    "try{var t=localStorage.getItem('theme');"
-    "if(t)document.documentElement.dataset.theme=t}catch(e){}"
+    "var t=null;try{t=localStorage.getItem('theme')}catch(e){}"
+    "if(!t){try{var m=document.cookie.match(/(?:^|; )theme=(dark|light)/);"
+    "if(m)t=m[1]}catch(e){}}"
+    "if(t==='dark'||t==='light')document.documentElement.dataset.theme=t;"
 )
 THEME_SCRIPT = """
 (function () {
   var btn = document.getElementById('theme');
   if (!btn) return;
   var root = document.documentElement;
+  function stored() {
+    var t = null;
+    try { t = localStorage.getItem('theme'); } catch (e) {}
+    if (!t) {
+      try {
+        var m = document.cookie.match(/(?:^|; )theme=(dark|light)/);
+        if (m) t = m[1];
+      } catch (e) {}
+    }
+    return t === 'dark' || t === 'light' ? t : null;
+  }
   function now() {
     return root.dataset.theme ||
       (window.matchMedia && matchMedia('(prefers-color-scheme: light)').matches
         ? 'light' : 'dark');
   }
   function label() { btn.textContent = now() === 'dark' ? 'Light mode' : 'Dark mode'; }
+  function apply(t) { if (t) root.dataset.theme = t; label(); }
   btn.addEventListener('click', function () {
     var next = now() === 'dark' ? 'light' : 'dark';
     root.dataset.theme = next;
     try { localStorage.setItem('theme', next); } catch (e) {}
+    try {
+      document.cookie = 'theme=' + next + '; path=/; max-age=31536000; SameSite=Lax';
+    } catch (e) {}
     label();
+  });
+  window.addEventListener('pageshow', function () { apply(stored()); });
+  window.addEventListener('storage', function (e) {
+    if (e.key === 'theme') apply(stored());
+  });
+  document.addEventListener('visibilitychange', function () {
+    if (!document.hidden) apply(stored());
   });
   label();
 })();
