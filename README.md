@@ -136,9 +136,10 @@ uv run python scripts/export_reviewed.py       # writes seed/reviewed.yaml
   reason and a date to look again (May and June 2027). The site says so instead
   of showing a number.
 - **Thin sources.** Several policies rest on a handful of articles from two to
-  six outlets, and Demonetisation on only two. Each page states how many sources
-  and outlets it uses. A "no negative evidence" finding means none was found in
-  those sources, not that none exists.
+  six outlets, and Demonetisation on only two. The policy pages no longer show
+  the source and outlet counts; they are still returned by the API. A "no
+  negative evidence" finding means none was found in those sources, not that
+  none exists.
 - **Open aspects.** Demonetisation (cost) and the 2G spectrum allocation
   (outcome and harm) have no usable evidence in sources from the allowed
   outlets, so they are shown as not yet assessed. They are not marked "no
