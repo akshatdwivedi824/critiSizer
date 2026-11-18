@@ -426,8 +426,6 @@ svg.hex text.star { fill: var(--accent); font-size: 20px; font-weight: 700; }
 .critique p { margin: 0 0 12px; max-width: 65ch; }
 .note { color: var(--muted); font-size: 13px; margin: 0; }
 .sect-h { font-size: 22px; }
-.desc { position: relative;
-  left: calc(-1 * max(0px, calc((100vw - 100%) / 2 - 32px))); }
 .aspects { display: grid; gap: 0; grid-template-columns: minmax(0, 1fr);
   border-top: 1px solid var(--line); }
 .aspects .starnote { grid-column: 1 / -1; }
@@ -635,8 +633,8 @@ def policy_html(view: PolicyDetail, extras: PageExtras, needed: int) -> str:
                 "The basis is stated in its box.</p>"
             )
         cards = (
-            "<div class='desc'><h2 class='sect-h'>Description</h2>"
-            f"<section class='aspects'>{cards}</section></div>"
+            "<h2 class='sect-h'>Description</h2>"
+            f"<section class='aspects'>{cards}</section>"
         )
 
     other = ""
